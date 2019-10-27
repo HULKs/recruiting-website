@@ -17,7 +17,7 @@ use Getopt::Long qw(GetOptions);
 
 use Capture::Tiny qw(capture_merged);
 
-my @REAL_PYTHON = qw(/usr/bin/python3 -B -S -E -I -s);
+my @REAL_PYTHON = qw(/usr/bin/python3 -B -E -I -s);
 
 my $PY_START_CALL = qr{
     \s* # Whitespace between function name and parenthesis
