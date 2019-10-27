@@ -37,3 +37,12 @@ def get_ball_image():
     del cv2
 
     return Image(im)
+
+def plot_ball(y, x):
+    print(f"Ball has been plotted to y={y}, x={x}")
+
+    try:
+        x = int(x)
+        y = int(y)
+    except ValueError:
+        print("plot_ball(x, y) expects integers >:/")
