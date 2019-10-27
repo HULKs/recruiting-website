@@ -1,0 +1,192 @@
+#!/usr/bin/env perl
+
+# A "safe" proxy for a python3 executable.
+# Note: probably very unsafe. Take additional
+# measures to secure your deployment.
+# Run -h for help / usage.
+
+# Constraints:
+# Python output (yes, even errors) should exclusively happen on STDOUT
+# STDERR is supposed to be the place for errors in *this* script
+
+use strict;
+use warnings;
+use 5.26.0;
+
+use Getopt::Long qw(GetOptions);
+
+use Capture::Tiny qw(capture_merged);
+
+my @REAL_PYTHON = qw(/usr/bin/python3 -B -S -E -I -s);
+
+my $PY_START_CALL = qr{
+    \s* # Whitespace between function name and parenthesis
+    \(  # Parenthesis
+}x;
+
+my $PY_START_LINE = qr{
+    ^
+    \s*?      # It's ok to have some whitespace
+    (?=[^\#]) # Ignore comments (TODO: also handle docstrings?)
+    .*?       # Don't care what comes here
+}xm;
+
+# Watch out for new functions:
+# https://docs.python.org/3.7/library/functions.html
+my $PYx_BANNED_FUNCTIONS = qr{
+    (?<MATCH_BANNED>
+    classmethod | compile | delattr | dir |
+    eval | exec | getattr | globals | hasattr |
+    help | id | input | isinstance | issubclass |
+    locals | memoryview | open | setattr | vars |
+    __.*?__
+)}x;
+
+my $PYx_BANNED_STATEMENTS = qr{
+    (?<MATCH_BANNED>
+    import
+)}x;
+
+sub print_usage {
+  print <<"EOF";
+Usage:
+    $0 --script=<path> [ --prologue=<path> | --epilogue=<path> ]
+    $0 [ -h | --help ]
+EOF
+}
+
+sub fake_name_error {
+
+  my $identifier = shift;
+
+  print STDOUT qq{NameError: name '$identifier' is not defined\n};
+  exit -1;
+}
+
+sub slurp_utf8 {
+
+  my $fn = shift;
+
+  local $/ = undef;
+
+  open(my $fh, '<:encoding(UTF-8)', $fn)
+      or die "Could not open file $fn: $!";
+  my $data = <$fh>;
+  close($fh)
+      or die "Could not close file $fn: $!";
+
+  return $data;
+}
+
+sub py_ban_functions {
+
+  my $py = shift;
+
+  my $forbidden = qr{
+      ( # Maybe this is a decorator?
+        $PY_START_LINE
+        @ # decorator
+        $PYx_BANNED_FUNCTIONS
+      |
+        $PY_START_LINE
+        $PYx_BANNED_FUNCTIONS
+      )
+  }xm;
+
+  if ($py =~ $forbidden) {
+    fake_name_error($+{MATCH_BANNED});
+  }
+
+  return $py;
+}
+
+sub py_ban_statements {
+
+  my $py = shift;
+
+  my $forbidden = qr{
+      $PY_START_LINE
+
+      \b # prevent matches like ｢my_import_func｣
+        $PYx_BANNED_STATEMENTS
+      \b
+  }xm;
+
+  if ($py =~ $forbidden) {
+    fake_name_error($+{MATCH_BANNED});
+  }
+
+  return $py;
+
+}
+
+sub py_rewrite_script {
+
+  my $py_unsafe = shift;
+
+  local $_ = $py_unsafe;
+
+  $_ = py_ban_functions  $_;
+  $_ = py_ban_statements $_;
+
+  return $_;
+}
+
+sub main {
+
+  binmode(STDIN,  ':encoding(UTF-8)');
+  binmode(STDOUT, ':encoding(UTF-8)');
+  binmode(STDERR, ':encoding(UTF-8)');
+
+  my ($arg_script, $arg_prologue, $arg_epilogue, $arg_help);
+
+  GetOptions('script=s'   => \$arg_script,
+             'prologue=s' => \$arg_prologue,
+             'epilogue=s' => \$arg_epilogue,
+             'h|help'     => \$arg_help)
+      or print "\n" and print_usage and exit;
+
+  if ($arg_help) {
+    print_usage;
+    exit;
+  }
+
+  unless (defined $arg_script) {
+    die "Missing argument: --script\n";
+  }
+
+  my $py_unsafe = slurp_utf8($arg_script);
+
+  my $py_safe = py_rewrite_script($py_unsafe);
+
+  my $file_safe = 'script-safe.py';
+  {
+    open(my $fh, '>:encoding(UTF-8)', $file_safe)
+        or die "Could not open python script: $!";
+
+    print $fh slurp_utf8($arg_prologue) . "\n"
+        if defined $arg_prologue;
+    print $fh $py_safe . "\n";
+    print $fh slurp_utf8($arg_epilogue) . "\n"
+        if defined $arg_epilogue;
+
+    close($fh)
+        or die "Could not close python script: $!";
+  }
+
+  # Merge script's STDOUT and STDERR
+  my $status;
+  my @cmd = (@REAL_PYTHON => $file_safe);
+  my $output = capture_merged {
+    system(@cmd);
+    $status = $?;
+  };
+
+  print STDOUT $output;
+
+  if ($status != 0) {
+    printf STDERR "child (@cmd) exited with value %d\n", $? >> 8;
+  }
+}
+
+main;
