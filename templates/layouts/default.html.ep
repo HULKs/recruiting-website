@@ -1,11 +1,40 @@
-<!DOCTYPE html>
-<html>
-  <meta charset="utf-8">
-  <head><title><%= title %></title></head>
-<style>
-.code-stdcombined {
-  font-family: monospace;
- }
-</style>
-  <body><%= content %></body>
-</html>
+<!doctype html>
+
+<meta charset="utf-8">
+<title>HULKs Recruiting 2019</title>
+<link rel="stylesheet" href="recruiting.css" type="text/css">
+
+<main>
+  <%= content %>
+</main>
+
+<script src="ace-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+  var showResults = (evt) => {
+      document.querySelector(".code-output").innerText =
+          evt.target.responseText;
+  };
+
+  window.addEventListener("load", () => {
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/github");
+      editor.session.setMode("ace/mode/python");
+      editor.setValue(`print("Hello, world!")\n`);
+
+      var runForm = document.querySelector("form");
+      var runButton = document.querySelector("button");
+
+      runButton.addEventListener("click", (evt) => {
+          evt.preventDefault();
+
+          var fd = new FormData(runForm);
+          fd.append("code-input", editor.getValue());
+
+          var req = new XMLHttpRequest();
+          req.addEventListener("load", showResults);
+          req.open("POST", "/run");
+          req.send(fd);
+      });
+
+  });
+</script>

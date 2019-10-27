@@ -1,0 +1,84 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: url(backdrop.jpg) no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position-y: 10%;
+  font-family: 'Helvetica Neue Lt Std', 'Helvetica Neue',
+               'Nimbus Sans L', 'Arimo', 'Arial',
+               sans-serif;
+}
+
+main {
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 7px -3px rgba(0,0,0,0.5);
+  margin: 2em auto;
+  max-width: 480px;
+}
+
+img {
+  max-width: 100%;
+}
+
+h1, h2, h3 {
+  color: #2fac66;
+  margin-bottom: 0.5em;
+}
+
+figure {
+  margin-left: -1em;
+  margin-right: -1em;
+}
+
+section {
+  padding: 1em;
+  border-bottom: 2px dashed #2fac66;
+}
+
+section:first-child {
+  background: #2fac66;
+  border-radius: 3px 3px 0 0;
+}
+
+section:first-child h1 {
+  color: #fff;
+  margin-top: 0.25em;
+  margin-bottom: 0;
+}
+
+section h2:first-child {
+  display: inline;
+}
+
+section h2:first-child ~ p {
+  display: inline;
+}
+
+section p {
+  font-size: .875em;
+  line-height: 1.5;
+}
+
+#editor {
+  height: 20em;
+}
+
+.code-input {
+  border: 1px solid #2fac66;
+}
+
+.code-output {
+  background: #2fac66;
+  color: #fff;
+}
+
+.code-output::before {
+  content: "[OUTPUT]";
+  display: block;
+}
