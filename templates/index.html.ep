@@ -46,7 +46,18 @@
   </figure>
 
   <form>
-    <div id="editor" class="code-input" name="code-input"></div>
+    <div id="editor" class="code-input" name="code-input">print("Hello, world!")
+
+# Hole eine Referenz auf das Bild
+image = get_ball_image()
+print(image)
+
+# Pixel [0, 0] hat einen Rotwert von 166
+print(image.at(x=0, y=0).r)
+
+# Zeichne ein Kreuz auf das Bild bei Pixel [2, 3]
+plot_ball(x=2, y=3)
+    </div>
     <button type="submit">run</button>
   </form>
 

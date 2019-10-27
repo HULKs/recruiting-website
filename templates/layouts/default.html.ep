@@ -19,7 +19,6 @@
       var editor = ace.edit("editor");
       editor.setTheme("ace/theme/github");
       editor.session.setMode("ace/mode/python");
-      editor.setValue(`print("Hello, world!")\n`);
 
       var runForm = document.querySelector("form");
       var runButton = document.querySelector("button");
