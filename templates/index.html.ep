@@ -1,0 +1,32 @@
+% layout 'default';
+% title 'Python Exec Test';
+<h1>Python Exec Test</h1>
+<form>
+  <textarea name="code-input" placeholder="code here"></textarea>
+  <button type="submit">run</button>
+</form>
+  <pre class="code-output">output goes here...</pre>
+
+<script>
+ var showResults = (evt) => {
+   document.querySelector(".code-output").innerText =
+     evt.target.responseText;
+ };
+
+ window.addEventListener("load", () => {
+   var runForm = document.querySelector("form");
+   var runButton = document.querySelector("button");
+
+   runButton.addEventListener("click", (evt) => {
+     evt.preventDefault();
+
+     var fd = new FormData(runForm);
+
+     var req = new XMLHttpRequest();
+     req.addEventListener("load", showResults);
+     req.open("POST", "/run");
+     req.send(fd);
+   });
+ });
+</script>
+
