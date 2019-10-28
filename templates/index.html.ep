@@ -6,6 +6,19 @@
 </section>
 
 <section>
+  <h2 style="display: block">Hello, future HULK!</h2>
+  <p>
+    As you arrived at this page, we assume you are interested in joining
+    our robot soccer team at the TUHH.  This is a small task for you to
+    check if you are interested in our kind of daily problems and if you
+    enjoy solving those issues.  For us it helps to see your level of
+    existing knowledge but is nothing we use to rate applicants or so!
+    Even when you are not completely happy with your solution or can't
+    find any, don't hesitate to send us your result.
+  </p>
+</section>
+
+<section>
   <h2>1</h2>
   <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean
     commodo ligula eget dolor. Aenean massa. Cum sociis natoque
