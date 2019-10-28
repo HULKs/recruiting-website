@@ -1,12 +1,18 @@
 # Don't forget to unimport as much as possbile afterwards.
+import io
 import sys
 
 # Disable Traceback to make fake name errors
 # seem like the real ones
 sys.tracebacklimit = 0
 
+# Capture stdout
+__original_stdout__ = sys.stdout
+sys.stdout = io.StringIO()
+
 # Unimport!
 del sys
+del io
 
 # Class definitions
 class Color(object):
@@ -30,6 +36,12 @@ class Image(object):
     def __repr__(self):
         return f"Image(size_x={self.size_x}, size_y={self.size_y})"
 
+# JSON response dictionary
+__app_response__ = {
+    "ball": {"y": 0, "x": 0},
+    "stdout": ""
+}
+
 # This is intended to be used by the, uh, user
 def get_ball_image():
     import cv2
@@ -39,13 +51,12 @@ def get_ball_image():
     return Image(im)
 
 def plot_ball(y, x):
-    print(f"Ball has been plotted to y={y}, x={x}")
-
     try:
         x = int(x)
         y = int(y)
     except ValueError:
         print("plot_ball(x, y) expects integers >:/")
 
-    with open("plot.txt", 'w') as f:
-        f.write(f"{y},{x}")
+    __app_response__["ball"] = {"y": y, "x": x}
+
+    print(f"Ball has been plotted to y={y}, x={x}")

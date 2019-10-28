@@ -14,10 +14,10 @@
       var status = evt.target.status;
 
       if (status == 200) {
-          document.querySelector(".code-output").innerText =
-              evt.target.responseText;
+          data = JSON.parse(evt.target.responseText);
 
-          plotBall();
+          document.querySelector(".code-output").innerText = data.stdout
+          plotBall(data.ball);
       } else {
           alert(`Server returned status ${status}! See console for details.`);
           console.log(evt.target);
@@ -34,35 +34,12 @@
       console.log(evt.target);
   };
 
-  var ballLoad = (evt) => {
-      var status = evt.target.status;
+  var plotBall = (ball) => {
+      var cursor = document.querySelector(".cursor");
+      cursor.style.opacity = "1";
 
-      if (status == 200) {
-          console.log(evt.target.responseText);
-
-          var cursor = document.querySelector(".cursor");
-          cursor.style.opacity = "1";
-
-          var y, x;
-          [y, x] = evt.target.responseText.split(",");
-
-          cursor.style.top = `${y}px`;
-          cursor.style.left = `${x}px`;
-      } else {
-          alert(`Server returned status ${status}! See console for details.`);
-          console.log(evt.target);
-      }
-  };
-
-  var plotBall = () => {
-      console.log("Now plotting ball...");
-
-      var req = new XMLHttpRequest();
-      req.addEventListener("load", ballLoad);
-      req.addEventListener("error", requestError);
-      req.addEventListener("timeout", requestTimeout);
-      req.open("GET", "/ball");
-      req.send();
+      cursor.style.top = `${ball.y}px`;
+      cursor.style.left = `${ball.x}px`;
   };
 
   window.addEventListener("load", () => {

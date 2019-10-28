@@ -12,7 +12,8 @@ sub run_python {
   my $py_unsafe = shift;
 
   my $interp = '/home/martin/proj/recruiting/safe-python3';
-  my @cmd = ($interp, '--script=script.py', '--prologue=prologue.py');
+  my @cmd = ($interp, '--script=script.py',
+             '--prologue=prologue.py', '--epilogue=epilogue.py');
 
   path('./script.py')->spurt(encode('UTF-8', $py_unsafe));
 
@@ -42,12 +43,6 @@ post '/run' => sub {
 
   my $py_unsafe = $c->param('code-input');
   $c->render(text => run_python($py_unsafe));
-};
-
-get '/ball' => sub {
-  my $c = shift;
-
-  $c->render(text => path('./plot.txt')->slurp);
 };
 
 app->start;
