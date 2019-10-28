@@ -46,3 +46,6 @@ def plot_ball(y, x):
         y = int(y)
     except ValueError:
         print("plot_ball(x, y) expects integers >:/")
+
+    with open("plot.txt", 'w') as f:
+        f.write(f"{y},{x}")

@@ -44,4 +44,10 @@ post '/run' => sub {
   $c->render(text => run_python($py_unsafe));
 };
 
+get '/ball' => sub {
+  my $c = shift;
+
+  $c->render(text => path('./plot.txt')->slurp);
+};
+
 app->start;

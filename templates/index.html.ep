@@ -55,6 +55,7 @@
 
 <section>
   <figure>
+    <img class="cursor" src="cursor.png">
     <img src="test.png">
   </figure>
 
