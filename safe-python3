@@ -13,6 +13,7 @@ use strict;
 use warnings;
 use 5.26.0;
 
+use File::Temp qw();
 use Getopt::Long qw(GetOptions);
 
 use Capture::Tiny qw(capture_merged);
@@ -159,24 +160,21 @@ sub main {
 
   my $py_safe = py_rewrite_script($py_unsafe);
 
-  my $file_safe = 'script-safe.py';
-  {
-    open(my $fh, '>:encoding(UTF-8)', $file_safe)
-        or die "Could not open python script: $!";
+  my $temp_safe = File::Temp->new;
+  $temp_safe->unlink_on_destroy(1);
+  binmode($temp_safe, ':encoding(UTF-8)');
 
-    print $fh slurp_utf8($arg_prologue) . "\n"
-        if defined $arg_prologue;
-    print $fh $py_safe . "\n";
-    print $fh slurp_utf8($arg_epilogue) . "\n"
-        if defined $arg_epilogue;
+  print $temp_safe slurp_utf8($arg_prologue) . "\n"
+      if defined $arg_prologue;
+  print $temp_safe $py_safe . "\n";
+  print $temp_safe slurp_utf8($arg_epilogue) . "\n"
+      if defined $arg_epilogue;
 
-    close($fh)
-        or die "Could not close python script: $!";
-  }
+  close($temp_safe) or die "Could not close tempfile: $!";
 
   # Merge script's STDOUT and STDERR
   my $status;
-  my @cmd = (@REAL_PYTHON => $file_safe);
+  my @cmd = (@REAL_PYTHON => $temp_safe->filename);
   my $output = capture_merged {
     system(@cmd);
     $status = $?;

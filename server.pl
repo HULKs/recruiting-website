@@ -2,6 +2,7 @@
 use Mojolicious::Lite;
 
 use Encode qw(encode);
+use File::Temp qw();
 use Symbol qw(gensym);
 
 use Capture::Tiny qw(capture);
@@ -12,10 +13,16 @@ sub run_python {
   my $py_unsafe = shift;
 
   my $interp = '/home/martin/proj/recruiting/safe-python3';
-  my @cmd = ($interp, '--script=script.py',
+
+  my $temp_in = File::Temp->new;
+  $temp_in->unlink_on_destroy(1);
+  binmode($temp_in, ':encoding(UTF-8)');
+  my $temp_in_fn = $temp_in->filename;
+
+  my @cmd = ($interp, "--script=$temp_in_fn",
              '--prologue=prologue.py', '--epilogue=epilogue.py');
 
-  path('./script.py')->spurt(encode('UTF-8', $py_unsafe));
+  path($temp_in_fn)->spurt(encode('UTF-8', $py_unsafe));
 
   my $status;
   my ($stdout, $stderr) = capture {
