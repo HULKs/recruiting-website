@@ -27,6 +27,26 @@ var plotBall = (ball) => {
     var cursor = document.querySelector(".cursor");
     cursor.style.opacity = "1";
 
+    if (ball.y < 0) {
+        alert('Y-Koordinate darf nicht kleiner als 0 sein >:/');
+        return;
+    }
+
+    if (ball.x < 0) {
+        alert('X-Koordinate darf nicht kleiner als 0 sein >:/');
+        return;
+    }
+
+    if (ball.y > graphic.naturalHeight) {
+        alert(`Y-Koordinate darf nicht größer als ${graphic.naturalHeight} sein >:/`);
+        return;
+    }
+
+    if (ball.x > graphic.naturalWidth) {
+        alert(`X-Koordinate darf nicht größer als ${graphic.naturalWidth} sein >:/`);
+        return;
+    }
+
     var x = (ball.x / graphic.naturalWidth) * graphic.width;
     var y = (ball.y / graphic.naturalHeight) * graphic.height;
 
