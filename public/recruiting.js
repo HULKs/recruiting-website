@@ -23,11 +23,17 @@ var requestTimeout = (evt) => {
 };
 
 var plotBall = (ball) => {
+    var graphic = document.querySelector(".graphic");
     var cursor = document.querySelector(".cursor");
     cursor.style.opacity = "1";
 
-    cursor.style.top = `${ball.y}px`;
-    cursor.style.left = `${ball.x}px`;
+    var x = (ball.x / graphic.naturalWidth) * graphic.width;
+    var y = (ball.y / graphic.naturalHeight) * graphic.height;
+
+    console.log(`Scaled cursor offset: y=${y}, x=${x}`);
+
+    cursor.style.top = `${y}px`;
+    cursor.style.left = `${x}px`;
 };
 
 window.addEventListener("load", () => {
