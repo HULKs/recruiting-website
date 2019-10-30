@@ -53,13 +53,16 @@
     nunc,</p>
 </section>
 
-<section>
+<section class="ide">
   <figure class="plot">
     <img class="cursor" src="cursor.png">
     <img class="graphic" src="test.png">
   </figure>
 
   <form>
+    <fieldset>
+      <button type="submit">Run program »</button>
+    </fieldset>
     <div id="editor" class="code-input" name="code-input">print("Hello, world!")
 
 # Hole eine Referenz auf das Bild
@@ -70,10 +73,7 @@ print(image)
 print(image.at(x=0, y=0).r)
 
 # Zeichne ein Kreuz auf das Bild bei Pixel [2, 3]
-plot_ball(x=2, y=3)
-    </div>
-    <button type="submit">run</button>
+plot_ball(x=2, y=3)</div>
+    <pre class="code-output">output goes here...</pre>
   </form>
-
-  <pre class="code-output">output goes here...</pre>
 </section>
