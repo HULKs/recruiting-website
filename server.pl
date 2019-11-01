@@ -5,7 +5,7 @@ use Encode qw(encode);
 use File::Temp qw();
 use Symbol qw(gensym);
 
-use Capture::Tiny qw(capture);
+use Capture::Tiny qw(capture_merged);
 use Mojo::File qw(path);
 
 sub run_python {
@@ -25,19 +25,18 @@ sub run_python {
   path($temp_in_fn)->spurt(encode('UTF-8', $py_unsafe));
 
   my $status;
-  my ($stdout, $stderr) = capture {
+  my $output = capture_merged {
     system(@cmd);
     $status = $?;
   };
 
-  print STDOUT $stdout;
-  print STDERR $stderr;
+  print STDOUT $output, "\n";
 
   if ($status != 0) {
     printf STDERR "child exited with value %d\n", $status >> 8;
   }
 
-  return $stdout;
+  return $output;
 }
 
 get '/' => sub {

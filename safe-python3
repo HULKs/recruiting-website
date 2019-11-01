@@ -15,6 +15,7 @@ use 5.26.0;
 
 use File::Temp qw();
 use Getopt::Long qw(GetOptions);
+use JSON::PP qw(encode_json);
 
 use Capture::Tiny qw(capture_merged);
 use IPC::Run qw(run timeout);
@@ -184,8 +185,13 @@ sub main {
   };
   if (my $e = $@) {
     if ($e =~ /IPC::Run: timeout/) {
-      print STDERR "Python interpreter timed out, please try again\n";
+      # kluuuuuudge!
+      print STDERR encode_json {
+        ball => {x => '0', y => '0'},
+        stdout => "Python interpreter timed out, please try again\n"
+      };
     } else {
+      # TODO: turn this into a log
       print STDERR $e;
     }
   } else {
