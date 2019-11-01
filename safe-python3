@@ -15,7 +15,7 @@ use 5.26.0;
 
 use File::Temp qw();
 use Getopt::Long qw(GetOptions);
-use JSON::PP qw(encode_json);
+use JSON::PP qw(decode_json encode_json);
 
 use Capture::Tiny qw(capture_merged);
 use IPC::Run qw(run timeout);
@@ -54,11 +54,19 @@ Usage:
 EOF
 }
 
+sub make_json_response {
+  return encode_json {
+    ball => {x => '0', y => '0'},
+    stdout => shift
+  };
+}
+
 sub fake_name_error {
 
   my $identifier = shift;
 
-  print STDOUT qq{NameError: name '$identifier' is not defined\n};
+  print STDOUT make_json_response(
+    "NameError: name '$identifier' is not defined");
   exit -1;
 }
 
@@ -180,17 +188,23 @@ sub main {
   };
   if (my $e = $@) {
     if ($e =~ /IPC::Run: timeout/) {
-      # kluuuuuudge!
-      print STDERR encode_json {
-        ball => {x => '0', y => '0'},
-        stdout => "Python interpreter timed out, please try again\n"
-      };
+      print STDOUT make_json_response(
+        "Python interpreter timed out, please try again");
     } else {
       # TODO: turn this into a log
       print STDERR $e;
     }
   } else {
-    print STDOUT $output;
+    eval {
+      decode_json($output)
+    };
+    if ($@) {
+      print STDOUT make_json_response($output);
+    } else {
+      # This is probably a valid response,
+      # just return it
+      print STDOUT $output;
+    }
   }
 }
 
