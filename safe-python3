@@ -23,11 +23,6 @@ use IPC::Run qw(run timeout);
 my @REAL_PYTHON = qw(/usr/bin/python3 -B -E -I -s);
 my $PYTHON_TIMEOUT = 5; # seconds
 
-my $PY_START_CALL = qr{
-    \s* # Whitespace between function name and parenthesis
-    \(  # Parenthesis
-}x;
-
 my $PY_START_LINE = qr{
     ^
     \s*?      # It's ok to have some whitespace
