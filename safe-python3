@@ -17,8 +17,10 @@ use File::Temp qw();
 use Getopt::Long qw(GetOptions);
 
 use Capture::Tiny qw(capture_merged);
+use IPC::Run qw(run timeout);
 
 my @REAL_PYTHON = qw(/usr/bin/python3 -B -E -I -s);
+my $PYTHON_TIMEOUT = 5; # seconds
 
 my $PY_START_CALL = qr{
     \s* # Whitespace between function name and parenthesis
@@ -172,18 +174,22 @@ sub main {
 
   close($temp_safe) or die "Could not close tempfile: $!";
 
-  # Merge script's STDOUT and STDERR
+  # Run real python interpreter
   my $status;
   my @cmd = (@REAL_PYTHON => $temp_safe->filename);
-  my $output = capture_merged {
-    system(@cmd);
-    $status = $?;
+
+  my $output;
+  eval {
+    run \@cmd, '>&', \$output, timeout($PYTHON_TIMEOUT);
   };
-
-  print STDOUT $output;
-
-  if ($status != 0) {
-    printf STDERR "child (@cmd) exited with value %d\n", $? >> 8;
+  if (my $e = $@) {
+    if ($e =~ /IPC::Run: timeout/) {
+      print STDERR "Python interpreter timed out, please try again\n";
+    } else {
+      print STDERR $e;
+    }
+  } else {
+    print STDOUT $output;
   }
 }
 
