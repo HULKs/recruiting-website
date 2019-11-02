@@ -34,14 +34,14 @@
     </fieldset>
     <div id="editor" class="code-input" name="code-input">print("Hello, world!")
 
-# Hole eine Referenz auf das Bild
+# Get a reference to the image above
 image = get_ball_image()
 print(image)
 
-# Pixel [0, 0] hat einen Rotwert von 166
+# Pixel [0, 0] has a red value of 166
 print(image.at(x=0, y=0).r)
 
-# Zeichne ein Kreuz auf das Bild bei Pixel [2, 3]
+# Draw a cursor onto the image at position [2, 3]
 plot_ball(x=2, y=3)</div>
     <pre class="code-output">output goes here...</pre>
   </form>
