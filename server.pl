@@ -51,4 +51,6 @@ post '/run' => sub {
   $c->render(text => run_python($py_unsafe));
 };
 
+app->config(hypnotoad => {listen => ['http://*:80']});
+
 app->start;
