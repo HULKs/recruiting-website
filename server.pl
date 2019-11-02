@@ -12,7 +12,7 @@ sub run_python {
 
   my $py_unsafe = shift;
 
-  my $interp = '/home/martin/proj/recruiting/safe-python3';
+  my $interp = './safe-python3';
 
   my $temp_in = File::Temp->new;
   $temp_in->unlink_on_destroy(1);
