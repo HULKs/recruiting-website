@@ -60,6 +60,10 @@ window.addEventListener("load", () => {
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/github");
     editor.session.setMode("ace/mode/python");
+    editor.session.setOptions({
+        tabSize: 4,
+        useSoftTabs: true
+    });
 
     var runForm = document.querySelector("form");
     var runButton = document.querySelector("button");
