@@ -2,8 +2,6 @@
 import io
 import sys
 
-import numpy
-
 # Disable Traceback to make fake name errors
 # seem like the real ones
 sys.tracebacklimit = 0
@@ -12,14 +10,21 @@ sys.tracebacklimit = 0
 __original_stdout__ = sys.stdout
 sys.stdout = io.StringIO()
 
-# Raise exceptions instead of issuing warnings
-numpy.seterr(all='raise')
-
 # Unimport!
-del numpy
 
 del sys
 del io
+
+# numpy configuration has to happen after
+# stdout redirection.
+# you have been warned.
+import numpy
+
+# Raise exceptions instead of issuing warnings
+numpy.seterr(all='raise')
+
+del numpy
+# End of numpy configuration
 
 # Class definitions
 class Color(object):
