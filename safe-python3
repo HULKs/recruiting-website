@@ -55,9 +55,12 @@ EOF
 }
 
 sub make_json_response {
+
+  my $stdout = shift;
+
   return encode_json {
     ball => {x => '0', y => '0'},
-    stdout => shift
+    stdout => $stdout
   };
 }
 
