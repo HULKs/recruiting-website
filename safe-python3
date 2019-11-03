@@ -199,6 +199,8 @@ sub main {
       decode_json($output)
     };
     if ($@) {
+      # Strip Python's /File "foo", line 60/
+      $output =~ s/^\s*File (.*?), line (.*)?\n//;
       print STDOUT make_json_response($output);
     } else {
       # This is probably a valid response,
