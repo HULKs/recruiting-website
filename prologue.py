@@ -54,9 +54,9 @@ def plot_ball(y, x):
     try:
         x = int(x)
         y = int(y)
+
+        __app_response__["ball"] = {"y": y, "x": x}
+
+        print(f"Ball has been plotted to y={y}, x={x}")
     except ValueError:
         print("plot_ball(x, y) expects integers >:/")
-
-    __app_response__["ball"] = {"y": y, "x": x}
-
-    print(f"Ball has been plotted to y={y}, x={x}")
