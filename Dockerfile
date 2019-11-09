@@ -9,4 +9,4 @@ COPY . /recruiting
 WORKDIR /recruiting
 
 ENV HULKS_RECRUITING_CONFIG=./recruiting.conf
-CMD hypnotoad -f server.pl
+CMD hypnotoad -f ./web
