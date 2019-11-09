@@ -10,9 +10,8 @@ use Mojo::File qw(path);
 
 sub run_python {
 
+  my $interp    = shift;
   my $py_unsafe = shift;
-
-  my $interp = './safe-python3';
 
   my $temp_in = File::Temp->new;
   $temp_in->unlink_on_destroy(1);
@@ -39,6 +38,8 @@ sub run_python {
   return $output;
 }
 
+plugin Config => {file => $ENV{HULKS_RECRUITING_CONFIG}};
+
 get '/' => sub {
   my $c = shift;
   $c->render(template => 'index');
@@ -47,11 +48,12 @@ get '/' => sub {
 post '/run' => sub {
   my $c = shift;
 
+  my $interpreter = $c->app->config->{web}->{interpreter};
   my $py_unsafe = $c->param('code-input');
-  $c->render(text => run_python($py_unsafe));
+
+  my $response = run_python($interpreter, $py_unsafe);
+  $c->render(text => $response);
 };
 
-app->max_request_size(4194304); # 4 MiB
-app->config(hypnotoad => {listen => ['http://*:80']});
-
+app->max_request_size(app->config->{web}->{max_request_size});
 app->start;

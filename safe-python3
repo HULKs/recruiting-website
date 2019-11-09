@@ -29,9 +29,16 @@ use JSON::PP qw(decode_json encode_json);
 use Capture::Tiny qw(capture_merged);
 use IPC::Run qw(run timeout);
 
+# Config
+unless (exists $ENV{HULKS_RECRUITING_CONFIG}) {
+  die "Missing environment variable: HULKS_RECRUITING_CONFIG\n";
+}
+
+my $CONFIG = do "$ENV{HULKS_RECRUITING_CONFIG}";
+
 # Constants
-my @REAL_PYTHON = qw(/usr/bin/python3 -B -E -I -s);
-my $PYTHON_TIMEOUT = 5; # seconds
+my @REAL_PYTHON = @{ $CONFIG->{sandbox}->{interpreter} };
+my $PYTHON_TIMEOUT = $CONFIG->{sandbox}->{timeout};
 
 
 

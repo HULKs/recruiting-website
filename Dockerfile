@@ -8,4 +8,5 @@ RUN apt install -y python3 python3-opencv
 COPY . /recruiting
 WORKDIR /recruiting
 
+ENV HULKS_RECRUITING_CONFIG=./recruiting.conf
 CMD hypnotoad -f server.pl
