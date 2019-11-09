@@ -41,7 +41,12 @@ kind of safety whatsoever. I/O is mostly done via stdout/stderr
 redirection. Things can break any second. It's written in Perl!!!
 Professors would not approve this.**
 
-(But it works, it is quite hackable, and it is easy to deploy.)
+On the bright side: it works, is quite
+hackable<small><sup>†</sup></small>, and easy to deploy.
+
+<p> <small><sup>†</sup> For instance, you could rewrite <em>sandbox</em>
+in the language of your choice. Its behavior is documented at the top of
+the script.  </p>
 
 # Huh!
 
