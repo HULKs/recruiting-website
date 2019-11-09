@@ -51,6 +51,7 @@ post '/run' => sub {
   $c->render(text => run_python($py_unsafe));
 };
 
+app->max_request_size(4194304); # 4 MiB
 app->config(hypnotoad => {listen => ['http://*:80']});
 
 app->start;
