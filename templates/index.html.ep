@@ -7,19 +7,69 @@
 
 <section>
   <h2 style="display: block">Hello, future HULK!</h2>
+
   <p>
     As you arrived at this page, we assume you are interested in joining
-    our robot soccer team at the TUHH.  This is a small task for you to
-    check if you are interested in our kind of daily problems and if you
-    enjoy solving those issues.  For us it helps to see your level of
-    existing knowledge but is nothing we use to rate applicants or so!
-    Even when you are not completely happy with your solution or can't
+    our robot soccer team at TUHH.
+  </p>
+  <p>
+    This is a small task for you to check if you are interested in our
+    kind of daily problems and if you enjoy solving those issues.  For
+    us it helps to see your skill level but is nothing we use to rate
+    applicants or so!
+  </p>
+  <p>
+    Even if you are not completely happy with your solution or can't
     find any, don't hesitate to send us your result.
   </p>
 </section>
 
 <section>
-  <p>[ To be extended. ]</p>
+  <h2>Your Task</h2>
+  <p>
+    Playing soccer can only be realized if the robot finds the ball,
+    obviously.  Here, you have an exemplary image out of our simulated
+    environment picturing the opponents goal, some field lines, as well
+    as an orange ball.  Please write a program in Python that detects
+    the ball in x- and y-coordinates.
+  </p>
+  <p>
+    We provide following classes and functions to accomplish this task:
+  </p>
+
+  <h3>Image</h3>
+  <p>
+    The <code>Image</code> object contains RGB color information for
+    each pixel which can be accessed by calling the <code>at()</code>
+    method with x- and y-coordinates.
+  </p>
+  <p>
+    For example, the red value of pixel with
+    coordinates <code>x=0</code> and <code>y=10</code> can be accessed
+    using: <code>image.at(x=0, y=10).r</code>
+  </p>
+  <p>
+    The size of the image is returned by
+    <code>image.size_x</code> and
+    <code>image.size_y</code>.
+  </p>
+
+  <h3>get_ball_image()</h3>
+  <p>
+    <code>get_ball_image()</code> returns a reference to
+    the <code>Image</code> object you're going to work with.
+  </p>
+
+  <h3>plot_ball()</h3>
+  <p>
+    <code>plot_ball()</code> takes x- and y-coordinates and
+    places the cursor on the image.
+  </p>
+  <p>
+    (Hint: look at the example code, click on “Run program”,
+    then look at the image.)
+  </p>
+
 </section>
 
 <section class="ide">
