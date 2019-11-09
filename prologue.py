@@ -29,9 +29,21 @@ del numpy
 # Class definitions
 class Color(object):
     def __init__(self, BGR):
-        self.b = BGR[0]
-        self.g = BGR[1]
-        self.r = BGR[2]
+        self._b = BGR[0]
+        self._g = BGR[1]
+        self._r = BGR[2]
+
+    @property
+    def b(self):
+        return int(self._b)
+
+    @property
+    def g(self):
+        return int(self._g)
+
+    @property
+    def r(self):
+        return int(self._r)
 
     def __repr__(self):
         return f"Color(r={self.r}, g={self.g}, b={self.b})"
