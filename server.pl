@@ -48,7 +48,7 @@ get '/' => sub {
 post '/run' => sub {
   my $c = shift;
 
-  my $interpreter = $c->app->config->{web}->{interpreter};
+  my $interpreter = $c->app->config->{sandbox}->{binary};
   my $py_unsafe = $c->param('code-input');
 
   my $response = run_python($interpreter, $py_unsafe);
