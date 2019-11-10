@@ -138,7 +138,9 @@ sub py_ban_functions {
         $PYx_BANNED_FUNCTIONS
       |
         $PY_START_LINE
-        $PYx_BANNED_FUNCTIONS
+        \b # prevent matches like ｢evaluate()｣
+          $PYx_BANNED_FUNCTIONS
+        \b
       )
   }xm;
 
