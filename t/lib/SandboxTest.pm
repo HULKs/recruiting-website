@@ -45,9 +45,6 @@ sub import {
   # Find out who imported this package
   my ($caller_pkg, $caller_file) = caller;
 
-  # Copy $expectation's contents here
-  my $PACKAGE_EXPECTATION = $test{EXPECTED_STDOUT};
-
   # Read caller's __DATA__ section into $data
   my $data = get_data($caller_file);
 
@@ -71,10 +68,12 @@ sub import {
 
   my $result = decode_json($out);
 
+  # Remove newline
+  chomp $test{DESCRIPTION};
+
   # Compare sandbox's stdout with expected stdout
   # (*This* is the actual test!)
-  is $result->{stdout}, $PACKAGE_EXPECTATION,
-      'stdout matches expectation';
+  is $result->{stdout}, $test{EXPECTED_STDOUT}, $test{DESCRIPTION};
 
   # Cool, done testing.
   done_testing;
