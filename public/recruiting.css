@@ -86,6 +86,19 @@ section code {
   height: 20em;
 }
 
+footer {
+  font-size: .75em;
+  letter-spacing: .05em;
+  padding: 1em;
+  text-align: center;
+  text-transform: uppercase;
+
+}
+
+footer a {
+  color: #2fac66;
+}
+
 .code-input {
   border: 1px solid #2fac66;
 }

@@ -7,6 +7,11 @@
 
 <main>
   <%= content %>
+
+  <footer>
+    <a href="https://hulks.de/imprint/">Impressum</a> |
+    <a href="https://github.com/hulks/recruiting-website">Source</a>
+  </footer>
 </main>
 
 <script src="ace-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
