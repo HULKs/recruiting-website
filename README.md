@@ -33,6 +33,20 @@ brain-damaged approach)
 
 That's essentially it.
 
+# Mhm!
+
+Build and run the test image:
+```
+make test
+make run
+```
+
+Build and run the production image:
+```
+make build
+make run
+```
+
 # Uhh?
 
 **This is essentially a giant hack. Like, the total fucking
