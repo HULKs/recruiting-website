@@ -1,19 +1,17 @@
 use strict;
 use warnings;
 
-our $DESCRIPTION = <<'EOF';
-Make sure the sample code passes.
-EOF
-
-our $EXPECTED_STDOUT = <<'EOF';
-Hello, world!
-Image(size_x=640, size_y=480)
-166
-Ball has been plotted to y=3, x=2
-EOF
-
-require "./t/SandboxTest.pm";
-'SandboxTest'->start;
+use SandboxTest {
+  DESCRIPTION => <<~'EOF',
+      Make sure the sample code passes.
+      EOF
+  EXPECTED_STDOUT => <<~'EOF'
+      Hello, world!
+      Image(size_x=640, size_y=480)
+      166
+      Ball has been plotted to y=3, x=2
+      EOF
+};
 
 __DATA__
 print("Hello, world!")

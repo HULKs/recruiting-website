@@ -10,7 +10,31 @@ use JSON::PP qw(decode_json);
 use IPC::Run qw(run);
 use Test::More;
 
-sub start {
+# Perl's DATA filehandle is apparently not open during BEGIN, so let's
+# roll our own parser.
+sub get_data {
+
+  my $filename = shift;
+
+  open(my $fh, '<:encoding(UTF-8)', $filename)
+      or die "Could not open $filename: $!";
+  my @lines = <$fh>;
+  close($fh)
+      or die "Could not close $filename: $!";
+
+  # Throw lines including __DATA__ away
+  while (local $_ = shift @lines) {
+    last if /^__DATA__$/;
+  }
+
+  return join "\n", @lines;
+}
+
+sub import {
+
+  # my %test = (shift)->%*;
+  my $package = shift;
+  my %test = (shift)->%*;
 
   # Load configuration
   unless (exists $ENV{HULKS_RECRUITING_CONFIG}) {
@@ -19,24 +43,13 @@ sub start {
   my $config = do "$ENV{HULKS_RECRUITING_CONFIG}";
 
   # Find out who imported this package
-  my $caller_pkg = caller;
-
-  # Write a reference to the caller's __DATA__ section
-  # into our symbol table
-  *PACKAGE_DATA = "${caller_pkg}::DATA";
+  my ($caller_pkg, $caller_file) = caller;
 
   # Copy $expectation's contents here
-  my $PACKAGE_EXPECTATION = $main::EXPECTED_STDOUT;
+  my $PACKAGE_EXPECTATION = $test{EXPECTED_STDOUT};
 
   # Read caller's __DATA__ section into $data
-  my $data = do {
-    local $/ = undef;
-
-    <PACKAGE_DATA>;
-  };
-
-  # Cool, done reading.
-  close(PACKAGE_DATA) or die "Could not close package data: $!";
+  my $data = get_data($caller_file);
 
   # Is there any data?
   ok(defined $data and $data ne '');

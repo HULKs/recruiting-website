@@ -9,4 +9,4 @@ COPY . /recruiting
 WORKDIR /recruiting
 
 ENV HULKS_RECRUITING_CONFIG=./recruiting.conf
-CMD prove -r t/
+CMD prove -It/lib -r t/
