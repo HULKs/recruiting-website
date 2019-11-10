@@ -2,6 +2,7 @@ package SandboxTest;
 
 use strict;
 use warnings;
+use feature ':5.26';
 
 use Encode qw(encode);
 use File::Temp qw();
@@ -44,6 +45,10 @@ sub import {
 
   # Find out who imported this package
   my ($caller_pkg, $caller_file) = caller;
+
+  # Enable modern features, strict, warnings in caller package
+  feature->import(':5.26');
+  $_->import for qw(strict warnings);
 
   # Read caller's __DATA__ section into $data
   my $data = get_data($caller_file);

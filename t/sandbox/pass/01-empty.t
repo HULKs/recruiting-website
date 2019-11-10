@@ -1,6 +1,3 @@
-use strict;
-use warnings;
-
 use SandboxTest {
   DESCRIPTION => <<~'EOF',
     Test for empty (except for a comment) user-submitted code.

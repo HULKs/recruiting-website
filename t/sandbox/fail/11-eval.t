@@ -1,6 +1,3 @@
-use strict;
-use warnings;
-
 use SandboxTest {
   DESCRIPTION => <<~'EOF',
       Test for banned functions (like eval) in user-submitted code. (2)

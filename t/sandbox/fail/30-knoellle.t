@@ -1,6 +1,3 @@
-use strict;
-use warnings;
-
 use SandboxTest {
   DESCRIPTION => <<~'EOF',
       Test for Konrad's hack.
