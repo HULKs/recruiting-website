@@ -37,14 +37,12 @@ That's essentially it.
 
 Build and run the test image:
 ```
-make test
-make run
+make run_tests
 ```
 
 Build and run the production image:
 ```
-make build
-make run
+make run_production
 ```
 
 # Uhh?
