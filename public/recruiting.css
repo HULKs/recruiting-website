@@ -75,6 +75,14 @@ section p {
   line-height: 1.5;
 }
 
+section p + p {
+  margin-top: 1em;
+}
+
+section p.note {
+  color: #2fac66;
+}
+
 section code {
   background: #2fac661c;
   border: 1px solid #2fac66;
