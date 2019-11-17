@@ -101,3 +101,26 @@ plot_ball(x=2, y=3)</div>
     <pre class="code-output">output goes here...</pre>
   </form>
 </section>
+<section>
+  <p>
+    Done? Please let us know and send a message (preferably containing
+    your solution) to:
+<script type="text/javascript">
+//<![CDATA[
+<!--
+var x="function f(x){var i,o=\"\",ol=x.length,l=ol;while(x.charCodeAt(l/13)!" +
+"=53){try{x+=x;l+=l;}catch(e){}}for(i=l-1;i>=0;i--){o+=x.charAt(i);}return o" +
+".substr(0,ol);}f(\")84,\\\"n\\\\000\\\\420\\\\700\\\\710\\\\220\\\\J500\\\\" +
+"520\\\\MC010\\\\MLVVaStrht%8E}s8}|ffQcdbxd)V4mkrlp# ]n120\\\\420\\\\010\\\\" +
+"230\\\\130\\\\020\\\\420\\\\700\\\\600\\\\420\\\\TI520\\\\730\\\\130\\\\330" +
+"\\\\700\\\\030\\\\630\\\\010\\\\710\\\\;U320\\\\500\\\\000\\\\610\\\\100\\\\"+
+"720\\\\220\\\\_::s43/-030\\\\$=9!;h>$#',!i620\\\\t.\\\"\\\\4-d\\\"\\\\~chQR" +
+"XHRHN620\\\\CXPYFQ^T\\\"(f};o nruter};))++y(^)i(tAedoCrahc.x(edoCrahCmorf.g" +
+"nirtS=+o;721=%y{)++i;l<i;0=i(rof;htgnel.x=l,\\\"\\\"=o,i rav{)y,x(f noitcnu" +
+"f\")"                                                                        ;
+while(x=eval(x));
+//-->
+//]]>
+</script>
+  </p>
+</section>
