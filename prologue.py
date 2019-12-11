@@ -75,12 +75,18 @@ def get_ball_image():
     return Image(im)
 
 def plot_ball(y, x):
+    max_balls = 100
     try:
+        if len(__app_response__["balls"]) == max_balls:
+            return
         x = int(x)
         y = int(y)
 
         __app_response__["balls"].append({"y": y, "x": x})
 
         print(f"Ball has been plotted to y={y}, x={x}")
+        if len(__app_response__["balls"]) == max_balls:
+            print("Max number of balls (max_balls) reached!")
+            return
     except ValueError:
         print("plot_ball(x, y) expects integers >:/")
