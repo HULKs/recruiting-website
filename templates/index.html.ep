@@ -79,7 +79,6 @@
 
 <section class="ide">
   <figure class="plot">
-    <img class="cursor" src="cursor.png">
     <img class="graphic" src="test.png">
   </figure>
 

@@ -62,7 +62,7 @@ class Image(object):
 
 # JSON response dictionary
 __app_response__ = {
-    "ball": {"y": 0, "x": 0},
+    "balls": [],
     "stdout": ""
 }
 
@@ -79,7 +79,7 @@ def plot_ball(y, x):
         x = int(x)
         y = int(y)
 
-        __app_response__["ball"] = {"y": y, "x": x}
+        __app_response__["balls"].append({"y": y, "x": x})
 
         print(f"Ball has been plotted to y={y}, x={x}")
     except ValueError:
