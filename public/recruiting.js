@@ -26,9 +26,9 @@ var requestTimeout = (evt) => {
 };
 
 var clearBalls = () => {
-    var cursors = document.getElementsByClassName("cursor");
-    while(cursors[0]) {
-        cursors[0].parentNode.removeChild(cursors[0]);
+    var cursors = document.querySelectorAll(".cursor");
+    for (cursor of cursors) {
+        cursor.parentNode.removeChild(cursor);
     }
 };
 

@@ -86,7 +86,7 @@ def plot_ball(y, x):
 
         print(f"Ball has been plotted to y={y}, x={x}")
         if len(__app_response__["balls"]) == max_balls:
-            print("Max number of balls (max_balls) reached!")
+            print(f"Max number of balls ({max_balls}) reached!")
             return
     except ValueError:
         print("plot_ball(x, y) expects integers >:/")
