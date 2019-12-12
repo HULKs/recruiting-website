@@ -3,9 +3,12 @@ var resultsLoad = (evt) => {
 
     if (status == 200) {
         data = JSON.parse(evt.target.responseText);
+        clearBalls();
 
         document.querySelector(".code-output").innerText = data.stdout
-        plotBall(data.ball);
+        for (ball of data.balls) {
+            plotBall(ball);
+        }
     } else {
         alert(`Server returned status ${status}! See console for details.`);
         console.log(evt.target);
@@ -22,10 +25,20 @@ var requestTimeout = (evt) => {
     console.log(evt.target);
 };
 
+var clearBalls = () => {
+    var cursors = document.querySelectorAll(".cursor");
+    for (cursor of cursors) {
+        cursor.parentNode.removeChild(cursor);
+    }
+};
+
 var plotBall = (ball) => {
     var graphic = document.querySelector(".graphic");
-    var cursor = document.querySelector(".cursor");
-    cursor.style.opacity = "1";
+    var plot = document.querySelector(".plot");
+    var cursor = document.createElement("img");
+    cursor.setAttribute("class", "cursor");
+    cursor.src = "cursor.png"
+    plot.insertBefore(cursor, graphic);
 
     if (ball.y < 0) {
         alert('Y-Koordinate darf nicht kleiner als 0 sein >:/');
