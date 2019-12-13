@@ -23,7 +23,7 @@ use 5.26.0;
 # Perl standard library
 use File::Temp qw();
 use Getopt::Long qw(GetOptions);
-use JSON::PP qw(decode_json encode_json);
+use JSON::XS qw(decode_json encode_json);
 
 # External modules
 use Capture::Tiny qw(capture_merged);
