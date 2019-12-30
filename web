@@ -41,6 +41,10 @@ plugin Config => {file => $ENV{HULKS_RECRUITING_CONFIG}};
 
 get '/' => sub {
   my $c = shift;
+
+  # Needed for site title
+  $c->stash(year => (localtime)[5] + 1900);
+
   $c->render(template => 'index');
 };
 

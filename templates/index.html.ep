@@ -1,8 +1,8 @@
 % layout 'default';
-% title 'HULKs Recruiting 2019';
+% title "HULKs Recruiting $year";
 
 <section>
-  <h1>HULKs Recruiting 2019</h1>
+  <h1><%= title %></h1>
 </section>
 
 <section>
