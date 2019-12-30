@@ -292,7 +292,7 @@ sub main {
       } else {
         # ... no.
         print STDOUT make_json_response(
-          'Response too large, please emit fewer characters.');
+          'Response too large, please emit fewer characters');
       }
     }
   }
