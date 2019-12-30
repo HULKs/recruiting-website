@@ -14,9 +14,9 @@
   </p>
   <p>
     This is a small task for you to check if you are interested in our
-    kind of daily problems and if you enjoy solving those issues.  For
-    us it helps to see your skill level but is nothing we use to rate
-    applicants or so!
+    kind of daily problems and if you enjoy solving those issues. In
+    addition, it helps us to determine your skill level (but your input
+    won't affect your application in any way).
   </p>
   <p>
     Even if you are not completely happy with your solution or can't
@@ -27,14 +27,16 @@
 <section>
   <h2>Your Task</h2>
   <p>
-    Playing soccer can only be realized if the robot finds the ball,
-    obviously.  Here, you have an exemplary image out of our simulated
-    environment picturing the opponents goal, some field lines, as well
-    as an orange ball.  Please write a program in Python that detects
-    the ball in x- and y-coordinates.
+    Naturally, a core element of robot soccer is ball detection.  On
+    this page we provide you with a sandbox to build a naive ball
+    detection algorithm on your own!  There is an exemplary image out of
+    our simulated environment picturing the opponents goal, some field
+    lines, as well as an orange ball.  Please write a program in Python
+    that detects the ball in x- and y-coordinates.
   </p>
   <p>
-    We provide following classes and functions to accomplish this task:
+    We provide the following classes and functions to assist you in
+    accomplishing this task:
   </p>
 
   <h3>Image</h3>
@@ -62,8 +64,9 @@
 
   <h3>plot_ball()</h3>
   <p>
-    <code>plot_ball()</code> takes x- and y-coordinates and
-    places the cursor on the image.
+    <code>plot_ball()</code> takes x- and y-coordinates and places a
+    cursor on the image. You are free to call it multiple times with
+    differing values to create multiple cursors.
   </p>
   <p>
     (Hint: look at the example code, click on “Run program”,
