@@ -285,8 +285,15 @@ sub main {
       # ... respond with style.
       print STDOUT make_json_response($output);
     } else {
-      # This is probably a valid response, just return it!
-      print STDOUT $output;
+      # This seems like a valid response, but is it small enough?
+      if (length $output <= $CONFIG->{sandbox}->{max_output}) {
+        # ... yes.
+        print STDOUT $output;
+      } else {
+        # ... no.
+        print STDOUT make_json_response(
+          'Response too large, please emit fewer characters.');
+      }
     }
   }
 }
