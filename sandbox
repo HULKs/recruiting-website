@@ -23,11 +23,12 @@ use 5.26.0;
 # Perl standard library
 use File::Temp qw();
 use Getopt::Long qw(GetOptions);
-use JSON::XS qw(decode_json encode_json);
+use Time::HiRes qw();
 
 # External modules
 use Capture::Tiny qw(capture_merged);
 use IPC::Run qw(run timeout);
+use JSON::XS qw(decode_json encode_json);
 
 # Config
 unless (exists $ENV{HULKS_RECRUITING_CONFIG}) {
@@ -79,6 +80,12 @@ Usage:
     $0 --script=<path> [ --prologue=<path> | --epilogue=<path> ]
     $0 [ -h | --help ]
 EOF
+}
+
+# Take string, add time +  newline, print to STDERR
+sub debug {
+  my $t = Time::HiRes::time;
+  print STDERR "\@$t: $_\n" for @_;
 }
 
 # Takes a string and turns it into a JSON
