@@ -1,4 +1,4 @@
-# Don't forget to unimport as much as possbile afterwards.
+# Don't forget to unimport as much as possible afterwards.
 import io
 import sys
 
