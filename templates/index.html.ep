@@ -89,6 +89,7 @@
     <fieldset>
       <select onchange="selectImage(this.value)">
         <option value="red-ball">Red ball</option>
+        <option value="red-ball-x2">Two red balls</option>
         <option value="new-ball">Real ball</option>
         <option value="new-ball-bottom">Partially obscured ball</option>
       </select>
