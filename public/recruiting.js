@@ -25,6 +25,11 @@ var requestTimeout = (evt) => {
     console.log(evt.target);
 };
 
+var selectImage = (image) => {
+    var graphic = document.querySelector(".graphic");
+    graphic.src = image + ".png";
+}
+
 var clearBalls = () => {
     var cursors = document.querySelectorAll(".cursor");
     for (cursor of cursors) {
@@ -80,12 +85,13 @@ window.addEventListener("load", () => {
 
     var runForm = document.querySelector("form");
     var runButton = document.querySelector("button");
+    var imageSelector = document.querySelector("select")
 
     runButton.addEventListener("click", (evt) => {
         evt.preventDefault();
 
         var fd = new FormData(runForm);
-        fd.append("code-input", editor.getValue());
+        fd.append("code-input", "filename = '" + imageSelector.value + "'\n" + editor.getValue());
 
         var req = new XMLHttpRequest();
         req.addEventListener("load", resultsLoad);

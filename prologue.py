@@ -66,11 +66,17 @@ __app_response__ = {
     "stdout": ""
 }
 
+filename = "red-ball"
+
 # This is intended to be used by the, uh, user
 def get_ball_image():
+    if "/" in filename:
+        raise Exception(f"invalid file name '{filename}'")
     import cv2
-    im = cv2.imread("public/test.png")
+    im = cv2.imread(f"public/{filename}.png")
     del cv2
+    if im is None:
+        raise Exception(f"invalid image '{filename}'")
 
     return Image(im)
 

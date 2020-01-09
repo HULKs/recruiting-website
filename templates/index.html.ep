@@ -82,11 +82,16 @@
 
 <section class="ide">
   <figure class="plot">
-    <img class="graphic" src="test.png">
+    <img class="graphic" src="red-ball.png">
   </figure>
 
   <form>
     <fieldset>
+      <select onchange="selectImage(this.value)">
+        <option value="red-ball">Red ball</option>
+        <option value="new-ball">Real ball</option>
+        <option value="new-ball-bottom">Partially obscured ball</option>
+      </select>
       <button type="submit">Run program »</button>
     </fieldset>
     <div id="editor" class="code-input" name="code-input">print("Hello, world!")
