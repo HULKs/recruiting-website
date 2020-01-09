@@ -93,6 +93,10 @@
         <option value="red-ball-obscured">Partially obscured red ball</option>
         <option value="new-ball">Real ball</option>
         <option value="new-ball-obscured">Partially obscured real ball</option>
+        <option value="nao-bottom-field">Camera bottom field</option>
+        <option value="nao-bottom-line">Camera bottom line</option>
+        <option value="nao-top-near">Camera top near</option>
+        <option value="nao-top-far">Camera top far</option>
       </select>
       <button type="submit">Run program »</button>
     </fieldset>
