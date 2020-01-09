@@ -58,13 +58,13 @@
 
   <h3>get_ball_image()</h3>
   <p>
-    <code>get_ball_image()</code> returns a reference to
+    <code>get_ball_image</code> returns a reference to
     the <code>Image</code> object you're going to work with.
   </p>
 
   <h3>plot_ball()</h3>
   <p>
-    <code>plot_ball()</code> takes x- and y-coordinates and places a
+    <code>plot_ball</code> takes x- and y-coordinates and places a
     cursor on the image. You are free to call it multiple times with
     differing values to create multiple cursors.
   </p>
