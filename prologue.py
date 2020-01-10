@@ -90,7 +90,7 @@ def plot_ball(x, y):
 
         __app_response__["balls"].append({"y": y, "x": x})
 
-        print(f"Ball has been plotted to y={y}, x={x}")
+        print(f"Ball has been plotted to x={x}, y={y}")
         if len(__app_response__["balls"]) == max_balls:
             print(f"Max number of balls ({max_balls}) reached!")
             return
