@@ -4,9 +4,9 @@ use SandboxTest {
       EOF
   EXPECTED_STDOUT => <<~'EOF'
       Hello, world!
-      Image(size_x=640, size_y=480)
+      Image(width=640, height=480)
       166
-      Ball has been plotted to y=3, x=2
+      Ball has been plotted to x=2, y=3
       EOF
 };
 
