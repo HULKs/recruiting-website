@@ -49,16 +49,16 @@ class Color(object):
         return f"Color(r={self.r}, g={self.g}, b={self.b})"
 
 class Image(object):
-    def at(self, y, x):
+    def at(self, x, y):
         return self.image[y][x]
 
     def __init__(self, image):
-        self.size_x = image.shape[1]
-        self.size_y = image.shape[0]
-        self.image = [[Color(image[y, x]) for x in range(self.size_x)] for y in range(self.size_y)]
+        self.width = image.shape[1]
+        self.height = image.shape[0]
+        self.image = [[Color(image[y, x]) for x in range(self.width)] for y in range(self.height)]
 
     def __repr__(self):
-        return f"Image(size_x={self.size_x}, size_y={self.size_y})"
+        return f"Image(width={self.width}, height={self.height})"
 
 # JSON response dictionary
 __app_response__ = {
@@ -80,7 +80,7 @@ def get_ball_image():
 
     return Image(im)
 
-def plot_ball(y, x):
+def plot_ball(x, y):
     max_balls = 100
     try:
         if len(__app_response__["balls"]) == max_balls:

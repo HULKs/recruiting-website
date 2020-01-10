@@ -48,12 +48,12 @@
   <p>
     For example, the red value of pixel with
     coordinates <code>x=0</code> and <code>y=10</code> can be accessed
-    using: <code>image.at(x=0, y=10).r</code>
+    using: <code>image.at(0, 10).r</code>
   </p>
   <p>
     The size of the image is returned by
-    <code>image.size_x</code> and
-    <code>image.size_y</code>.
+    <code>image.width</code> and
+    <code>image.height</code>.
   </p>
 
   <h3>get_ball_image()</h3>
