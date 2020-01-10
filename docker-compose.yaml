@@ -1,0 +1,7 @@
+version: "3"
+services:
+  recruiting-website:
+    image: recruiting-website
+    build: .
+    ports:
+    - "80:80"
