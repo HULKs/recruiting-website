@@ -19,8 +19,4 @@ convert_markdown2html() {
     "${markdown_path}"
 }
 
-echo
-
 find pages -name \*.md | while read f; do convert_markdown2html $f; done
-
-echo

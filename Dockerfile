@@ -10,17 +10,24 @@ RUN apk add --no-cache \
     lua5.3 \
     lua5.3-lpeg
 
-RUN apk add --no-cache \
-    tree
-
 COPY static-builder.sh pandoc.theme /data/
 COPY pages /data/pages
 
-RUN tree /data && cd /data && /data/static-builder.sh && tree /data
+RUN cd /data && /data/static-builder.sh
+
+################################################################################
+FROM python:3.8 AS recruiting-website-image-copyer
+
+COPY --from=recruiting-website-static-builder /data/pages /data/pages
+COPY --from=recruiting-website-static-builder /data/static /data/static
+COPY image-copyer.py requirements.image-copyer.txt /data/
+
+RUN pip install --no-cache-dir --requirement /data/requirements.image-copyer.txt
+RUN python image-copyer.py static/index.html pages
 
 ################################################################################
 # FROM nginx:stable
 
-# COPY --from=recruiting-website-static-builder /data/static /usr/share/nginx/html
+# COPY --from=recruiting-website-image-copyer /data/static /usr/share/nginx/html
 # COPY nginx-default.conf /etc/nginx/conf.d/default.conf
 # COPY favicon.ico style.css /usr/share/nginx/html/

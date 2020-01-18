@@ -32,3 +32,7 @@ public:
     explicit Foo(const std::string &temp);
 };
 ```
+
+## Image
+
+![The Office](source.gif)
