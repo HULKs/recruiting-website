@@ -17,8 +17,11 @@ CMD tail -f /dev/null
 Foo
 
 <x-viewer type="image" file="/image.png" />
+
 <x-viewer type="text" file="/test.txt" />
+
 <x-editor type="text" file="/test.txt" />
+
 <x-terminal working-directory="/" />
 
 ## C++ code
