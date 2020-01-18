@@ -13,7 +13,7 @@ RUN apk add --no-cache \
 RUN apk add --no-cache \
     tree
 
-COPY static-builder.sh /data/static-builder.sh
+COPY static-builder.sh pandoc.theme /data/
 COPY pages /data/pages
 
 RUN tree /data && cd /data && /data/static-builder.sh && tree /data

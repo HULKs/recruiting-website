@@ -21,7 +21,6 @@ convert_markdown2html() {
 
 echo
 
-pandoc --print-highlight-style pygments > pandoc.theme
 find pages -name \*.md | while read f; do convert_markdown2html $f; done
 
 echo
