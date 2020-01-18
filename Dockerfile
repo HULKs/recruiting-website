@@ -1,7 +1,7 @@
-FROM pandoc/core AS pandoc
+FROM pandoc/core:2.9.1.1 AS pandoc
 
 ################################################################################
-FROM alpine AS recruiting-website-static-builder
+FROM alpine:3.11 AS recruiting-website-static-builder
 
 COPY --from=pandoc /usr/bin/pandoc* /usr/bin/
 RUN apk add --no-cache \
@@ -23,7 +23,7 @@ COPY --from=recruiting-website-static-builder /data/static /data/static
 COPY image-copyer.py requirements.image-copyer.txt /data/
 
 RUN pip install --no-cache-dir --requirement /data/requirements.image-copyer.txt
-RUN python image-copyer.py static/index.html pages
+RUN python /data/image-copyer.py /data/static/index.html /data/pages
 
 ################################################################################
 # FROM nginx:stable
