@@ -25,4 +25,4 @@ for root, dirs, files in os.walk(html_path):
         new_tag.string = f'Terminal in initial working-directory \'{terminal["working-directory"]}\''
         terminal.replace_with(new_tag)
     with open(file_path, 'w') as f:
-      f.write(soup.prettify())
+      f.write(soup.encode(formatter='html5').decode('utf-8'))
