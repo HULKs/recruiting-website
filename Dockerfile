@@ -23,11 +23,20 @@ COPY --from=recruiting-website-static-builder /data/static /data/static
 COPY image-copyer.py requirements.image-copyer.txt /data/
 
 RUN pip install --no-cache-dir --requirement /data/requirements.image-copyer.txt
-RUN python /data/image-copyer.py /data/static/index.html /data/pages
+RUN python /data/image-copyer.py /data/static /data/pages
 
 ################################################################################
-# FROM nginx:stable
+FROM python:3.8 AS recruiting-website-html-finalizer
 
-# COPY --from=recruiting-website-image-copyer /data/static /usr/share/nginx/html
-# COPY nginx-default.conf /etc/nginx/conf.d/default.conf
-# COPY favicon.ico style.css /usr/share/nginx/html/
+COPY --from=recruiting-website-image-copyer /data/static /data/static
+COPY html-finalizer.py requirements.html-finalizer.txt /data/
+
+RUN pip install --no-cache-dir --requirement /data/requirements.html-finalizer.txt
+RUN python /data/html-finalizer.py /data/static
+
+################################################################################
+FROM nginx:stable
+
+COPY --from=recruiting-website-html-finalizer /data/static /usr/share/nginx/html
+COPY nginx-default.conf /etc/nginx/conf.d/default.conf
+COPY favicon.ico style.css /usr/share/nginx/html/
