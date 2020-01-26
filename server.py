@@ -308,9 +308,8 @@ class WorkerController:
         for page in self.pages:
             try:
                 print(f'Building {page["dockerfile"]} ...')
-                base_path = os.path.dirname(page['dockerfile'])
 
-                process = await asyncio.create_subprocess_exec('docker', 'build', '--pull', '--tag', page['image_name'], base_path)
+                process = await asyncio.create_subprocess_exec('docker', 'build', '--pull', '--tag', page['image_name'], os.path.dirname(page['dockerfile']))
 
                 await process.wait()
 
