@@ -16,9 +16,11 @@ CMD tail -f /dev/null
 
 Foo
 
-<x-viewer type="image" file="/image.png" />
+<x-text file="/test.txt" />
 
-<x-viewer type="text" file="/test.txt" />
+<x-image file="/image.png" />
+
+<x-button command="echo Hello World!">Print Hello World</x-button>
 
 <x-editor type="text" file="/test.txt" />
 
