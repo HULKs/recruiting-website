@@ -2,7 +2,7 @@
 
 Very cool!
 
-![Other Office](source.gif)
+![Other Office](../source.gif)
 
 ## Widget Tests
 

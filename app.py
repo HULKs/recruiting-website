@@ -8,28 +8,32 @@ from aiohttp import web
 import socketio
 
 class StaticPage:
-    def __init__(self, url: str, page_path: str):
+    def __init__(self, pages_path: str, url: str, page_path: str):
+        self.pages_path = pages_path
         self.url = url
-        self.routes = [
-            web.get(self.url, self.serve_index),
-        ]
         self.page_path = page_path
         self.markdown_path = os.path.join(page_path, 'page.md')
         with open(self.markdown_path) as f:
             self.markdown = f.read()
         self.html = markdown2.markdown(self.markdown)
-        # TODO: check static files
-        # soup = bs4.BeautifulSoup(self.html, 'html.parser')
-        # self.static_files = []
-        # for img in soup.find_all('img'):
-        #     self.static_files.append(os.path.realpath(os.path.join(url, img['src'])))
+        self.routes = [
+            web.get(self.url, self.serve_index),
+        ]
+        soup = bs4.BeautifulSoup(self.html, 'html.parser')
+        for img in soup.find_all('img'):
+            # TODO: check if static files escape pages directory
+            self.routes.append(web.get(os.path.realpath(os.path.join(url, img['src'])), self.serve_image))
     
-    async def serve_index(self, request):
+    async def serve_index(self, request: web.Request):
         return web.Response(text=self.html, content_type='text/html')
+    
+    async def serve_image(self, request: web.Request):
+        path = os.path.realpath(os.path.join(self.pages_path, os.path.relpath(request.path, start=os.path.abspath(os.path.sep))))
+        return web.FileResponse(path=path)
 
 class InteractivePage(StaticPage, socketio.AsyncNamespace):
-    def __init__(self, url: str, page_path: str):
-        StaticPage.__init__(self, url, page_path)
+    def __init__(self, pages_path: str, url: str, page_path: str):
+        StaticPage.__init__(self, pages_path, url, page_path)
         socketio.AsyncNamespace.__init__(self, namespace=url)
         self.hash = hashlib.sha256(url.encode('utf-8')).hexdigest()
         self.connected_clients = 0
@@ -77,13 +81,13 @@ def get_pages(sio, pages_path):
             try:
                 # test to open Dockerfile
                 open(dockerfile_path)
-                page = InteractivePage(url, page_path)
+                page = InteractivePage(pages_path, url, page_path)
                 pages.append(page)
             except OSError as e:
                 # errno 2: No such file or directory
                 if e.errno != 2:
                     raise
-                page = StaticPage(url, page_path)
+                page = StaticPage(pages_path, url, page_path)
                 pages.append(page)
     return pages
 
