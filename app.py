@@ -7,6 +7,7 @@ import re
 from aiohttp import web
 import socketio
 
+
 class StaticPage:
     def __init__(self, pages_path: str, url: str, page_path: str):
         self.pages_path = pages_path
@@ -22,14 +23,17 @@ class StaticPage:
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
         for img in soup.find_all('img'):
             # TODO: check if static files escape pages directory
-            self.routes.append(web.get(os.path.realpath(os.path.join(url, img['src'])), self.serve_image))
-    
+            self.routes.append(web.get(os.path.realpath(
+                os.path.join(url, img['src'])), self.serve_image))
+
     async def serve_index(self, request: web.Request):
         return web.Response(text=self.html, content_type='text/html')
-    
+
     async def serve_image(self, request: web.Request):
-        path = os.path.realpath(os.path.join(self.pages_path, os.path.relpath(request.path, start=os.path.abspath(os.path.sep))))
+        path = os.path.realpath(os.path.join(self.pages_path, os.path.relpath(
+            request.path, start=os.path.abspath(os.path.sep))))
         return web.FileResponse(path=path)
+
 
 class InteractivePage(StaticPage, socketio.AsyncNamespace):
     def __init__(self, pages_path: str, url: str, page_path: str):
@@ -42,7 +46,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         for i, element in enumerate(soup.find_all('x-button')):
             widget = ButtonWidget(self, i, soup, element)
             self.widgets[widget.hash] = widget
-    
+
     def on_set_uuid(self, sid: str, uuid):
         print(f'{sid} set uuid {uuid}')
         self.enter_room(sid, uuid)
@@ -51,7 +55,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
             print(f'attach {sid} to worker {uuid}')
         else:
             print(f'start worker {uuid} for {sid}')
-    
+
     def on_disconnect(self, sid: str):
         print(f'{sid} disconnected')
         self.connected_clients -= 1
@@ -60,12 +64,15 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         else:
             print(f'stop worker from {sid}')
 
+
 class ButtonWidget:
     def __init__(self, page: InteractivePage, i: int, soup: bs4.BeautifulSoup, element):
         self.page = page
         self.title = element.string
         self.command = element['command']
-        self.hash = hashlib.sha256(f'{self.page.hash}-{self.title}-{self.command}-{i}'.encode('utf-8')).hexdigest()
+        self.hash = hashlib.sha256(
+            f'{self.page.hash}-{self.title}-{self.command}-{i}'.encode('utf-8')).hexdigest()
+
 
 def get_pages(sio, pages_path):
     pages_path = os.path.abspath(pages_path)
@@ -76,7 +83,8 @@ def get_pages(sio, pages_path):
             # 1. remove pages directory prefix
             # 2. make the path absolute to root it in webroot
             # 3. normalize path (remove '.' and '..')
-            url = os.path.normpath(os.path.join(os.path.abspath(os.sep), os.path.relpath(page_path, start=pages_path)))
+            url = os.path.normpath(os.path.join(os.path.abspath(
+                os.sep), os.path.relpath(page_path, start=pages_path)))
             dockerfile_path = os.path.join(page_path, 'Dockerfile')
             try:
                 # test to open Dockerfile
@@ -91,8 +99,10 @@ def get_pages(sio, pages_path):
                 pages.append(page)
     return pages
 
+
 if __name__ == '__main__':
-    sio = socketio.AsyncServer(logger=True, async_mode='aiohttp', cors_allowed_origins='*')
+    sio = socketio.AsyncServer(
+        logger=True, async_mode='aiohttp', cors_allowed_origins='*')
     app = web.Application()
     sio.attach(app)
     pages = get_pages(sio, 'pages')
