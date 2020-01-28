@@ -21,7 +21,7 @@ class StaticPage:
             web.get(self.url, self.serve_index),
             web.get('/favicon.ico', self.serve_file),
         ]
-        
+
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
         for img in soup.find_all('img'):
             # TODO: check if static files escape pages directory
@@ -60,7 +60,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         self.hash = hashlib.sha256(url.encode('utf-8')).hexdigest()
         self.connected_clients = 0
         self.widgets = {}
-        
+
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
         for i, element in enumerate(soup.find_all('x-button')):
             widget = ButtonWidget(self, i, element)
@@ -69,10 +69,46 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         if len(self.widgets) > 0:
             self.routes.append(web.get('/socket.io.js', self.serve_file))
             soup.head.append(soup.new_tag('script', src='/socket.io.js'))
+            connect_script = soup.new_tag('script')
+            connect_script.string = f'''
+                const uuidv4 = () => {{
+                    // https://gist.github.com/outbreak/316637cde245160c2579898b21837c1c
+                    const getRandomSymbol = (symbol) => {{
+                        var array;
+                        if (symbol === 'y') {{
+                            array = ['8', '9', 'a', 'b'];
+                            return array[Math.floor(Math.random() * array.length)];
+                        }}
+                        array = new Uint8Array(1);
+                        window.crypto.getRandomValues(array);
+                        return (array[0] % 16).toString(16);
+                    }}
+                    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, getRandomSymbol);
+                }}
+                if (location.hash.length !== 37) {{
+                    location.hash = `#${{uuidv4()}}`;
+                }}
+                const uuid = location.hash.substr(1);
+                const socket = io('{self.url}');
+                socket.on('connect', function () {{
+                    console.log('connect');
+                    socket.emit('set_uuid', uuid);
+                }});
+                socket.on('event', function (data) {{
+                    console.log('data', data);
+                }});
+                socket.on('disconnect', function () {{
+                    console.log('disconnect');
+                }});
+            '''
+            soup.head.append(connect_script)
         self.html = soup.encode(formatter='html5').decode('utf-8')
 
     def __repr__(self):
         return f'<InteractivePage url=\'{self.url}\'>'
+
+    def on_connect(self, sid: str, environment):
+        print(f'{sid} connected')
 
     def on_set_uuid(self, sid: str, uuid):
         print(f'{sid} set uuid {uuid}')
@@ -154,7 +190,7 @@ if __name__ == '__main__':
     pages = get_pages(sio, 'pages')
     print('pages:')
     for page in pages:
-        print(' ',page)
+        print(' ', page)
         if isinstance(page, InteractivePage):
             sio.register_namespace(page)
             print('    widgets:', page.widgets)
