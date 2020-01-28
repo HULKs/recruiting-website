@@ -12,7 +12,7 @@ Foo
 
 <x-image file="/image.png" />
 
-<x-button command="echo Hello World!">Print Hello World</x-button>
+<x-button command="echo Hello World">Print Hello World</x-button>
 
 <x-editor type="text" file="/test.txt" />
 

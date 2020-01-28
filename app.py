@@ -26,6 +26,9 @@ class StaticPage:
             self.routes.append(web.get(os.path.realpath(
                 os.path.join(url, img['src'])), self.serve_image))
 
+    def __repr__(self):
+        return f'<StaticPage url=\'{self.url}\'>'
+
     async def serve_index(self, request: web.Request):
         return web.Response(text=self.html, content_type='text/html')
 
@@ -45,7 +48,11 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
         for i, element in enumerate(soup.find_all('x-button')):
             widget = ButtonWidget(self, i, soup, element)
+            element.replace_with(widget.replacement)
             self.widgets[widget.hash] = widget
+
+    def __repr__(self):
+        return f'<InteractivePage url=\'{self.url}\'>'
 
     def on_set_uuid(self, sid: str, uuid):
         print(f'{sid} set uuid {uuid}')
@@ -68,10 +75,24 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
 class ButtonWidget:
     def __init__(self, page: InteractivePage, i: int, soup: bs4.BeautifulSoup, element):
         self.page = page
+        self.soup = soup
         self.title = element.string
         self.command = element['command']
         self.hash = hashlib.sha256(
             f'{self.page.hash}-{self.title}-{self.command}-{i}'.encode('utf-8')).hexdigest()
+        self.construct_replacement()
+
+    def __repr__(self):
+        return f'<ButtonWidget title=\'{self.title}\', command=\'{self.command}\'>'
+
+    def construct_replacement(self):
+        self.replacement = self.soup.new_tag('div')
+        h1 = self.soup.new_tag('h1')
+        h1.string = 'Button'
+        self.replacement.append(h1)
+        button = self.soup.new_tag('button')
+        button.string = self.title
+        self.replacement.append(button)
 
 
 def get_pages(sio, pages_path):
