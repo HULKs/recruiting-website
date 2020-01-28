@@ -19,12 +19,27 @@ class StaticPage:
         self.html = markdown2.markdown(self.markdown)
         self.routes = [
             web.get(self.url, self.serve_index),
+            web.get('/favicon.ico', self.serve_file),
         ]
+        
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
         for img in soup.find_all('img'):
             # TODO: check if static files escape pages directory
             self.routes.append(web.get(os.path.realpath(
-                os.path.join(url, img['src'])), self.serve_image))
+                os.path.join(url, img['src'])), self.serve_file))
+        html = soup.new_tag('html')
+        head = soup.new_tag('head')
+        html.append(head)
+        title = soup.new_tag('title')
+        title.string = 'HULKs Recruiting Website'
+        head.append(title)
+        body = soup.new_tag('body')
+        for child in soup.contents:
+            body.append(child.extract())
+        html.append(body)
+        soup.append(bs4.Doctype('html'))
+        soup.append(html)
+        self.html = soup.encode(formatter='html5').decode('utf-8')
 
     def __repr__(self):
         return f'<StaticPage url=\'{self.url}\'>'
@@ -32,7 +47,7 @@ class StaticPage:
     async def serve_index(self, request: web.Request):
         return web.Response(text=self.html, content_type='text/html')
 
-    async def serve_image(self, request: web.Request):
+    async def serve_file(self, request: web.Request):
         path = os.path.realpath(os.path.join(self.pages_path, os.path.relpath(
             request.path, start=os.path.abspath(os.path.sep))))
         return web.FileResponse(path=path)
@@ -45,11 +60,15 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         self.hash = hashlib.sha256(url.encode('utf-8')).hexdigest()
         self.connected_clients = 0
         self.widgets = {}
+        
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
         for i, element in enumerate(soup.find_all('x-button')):
             widget = ButtonWidget(self, i, element)
             element.replace_with(widget.get_replacement(soup))
             self.widgets[widget.hash] = widget
+        if len(self.widgets) > 0:
+            self.routes.append(web.get('/socket.io.js', self.serve_file))
+            soup.head.append(soup.new_tag('script', src='/socket.io.js'))
         self.html = soup.encode(formatter='html5').decode('utf-8')
 
     def __repr__(self):
@@ -92,6 +111,12 @@ class ButtonWidget:
         button = soup.new_tag('button')
         button.string = self.title
         replacement.append(button)
+        script = soup.new_tag('script')
+        script.string = '''
+            console.log("Hello World from Python!");
+            console.log("Another line!");
+        '''
+        replacement.append(script)
         return replacement
 
 
