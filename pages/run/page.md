@@ -1,18 +1,18 @@
-# Running something inside the container
+# REMOTE CODE EXECUTION AS A FEATURE!!
 
-Very cool!
+It's indeed very cool!
 
 ![Other Office](../source.gif)
 
 ## Widget Tests
 
-Foo
+Here come widgets:
 
 <x-text file="/test.txt" />
 
 <x-image file="/image.png" />
 
-<x-button command="echo Hello World">Print Hello World</x-button>
+<x-button command="echo The current server time is: $(date)">Print Hello World</x-button>
 
 <x-editor type="text" file="/test.txt" />
 

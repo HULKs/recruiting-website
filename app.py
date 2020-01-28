@@ -1,10 +1,12 @@
 import os
 import os.path
+import sys
 import hashlib
 import markdown2
 import bs4
 import re
 from aiohttp import web
+import asyncio
 import socketio
 
 
@@ -90,14 +92,19 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
                 }}
                 const uuid = location.hash.substr(1);
                 const socket = io('{self.url}');
-                socket.on('connect', function () {{
+                socket.on('connect', () => {{
                     console.log('connect');
                     socket.emit('set_uuid', uuid);
                 }});
-                socket.on('event', function (data) {{
-                    console.log('data', data);
+                let button_callbacks = {{}};
+                socket.on('button_stdout', data => {{
+                    if (data.hash && button_callbacks[data.hash]) {{
+                        button_callbacks[data.hash](data);
+                    }} else {{
+                        console.error('Failed to send to widget', data);
+                    }}
                 }});
-                socket.on('disconnect', function () {{
+                socket.on('disconnect', () => {{
                     console.log('disconnect');
                 }});
             '''
@@ -112,6 +119,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
 
     def on_set_uuid(self, sid: str, uuid):
         print(f'{sid} set uuid {uuid}')
+        # TODO: validate uuid
         self.enter_room(sid, uuid)
         self.connected_clients += 1
         if self.connected_clients > 1:
@@ -126,6 +134,20 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
             print(f'detach {sid} from worker')
         else:
             print(f'stop worker from {sid}')
+
+    async def on_button_click(self, sid: str, data):
+        print(f'Button click of {sid}:', data)
+        try:
+            widget_hash = data['hash']
+            try:
+                response = await self.widgets[widget_hash].on_click()
+                response['hash'] = widget_hash
+                await self.emit('button_stdout', response)
+            except (KeyError, AttributeError):
+                print(
+                    f'Failed to send click to {widget_hash} (no widget or wrong type)', data, file=sys.stderr)
+        except KeyError:
+            print(f'Failed to extract hash of widget', data, file=sys.stderr)
 
 
 class ButtonWidget:
@@ -144,16 +166,40 @@ class ButtonWidget:
         h1 = soup.new_tag('h1')
         h1.string = 'Button'
         replacement.append(h1)
-        button = soup.new_tag('button')
+        button = soup.new_tag('button', onClick=f'buttonClick_{self.hash}()')
         button.string = self.title
         replacement.append(button)
+        output = soup.new_tag('div', id=f'button-output-{self.hash}')
+        replacement.append(output)
         script = soup.new_tag('script')
-        script.string = '''
-            console.log("Hello World from Python!");
-            console.log("Another line!");
+        script.string = f'''
+            const buttonClick_{self.hash} = () => {{
+                console.log('Click of {self.hash}');
+                socket.emit('button_click', {{ 'hash': '{self.hash}' }});
+            }};
+            button_callbacks['{self.hash}'] = data => {{
+                console.log('Got response:', data);
+                if (data.stdout) {{
+                    document.getElementById('button-output-{self.hash}').innerText = data.stdout;
+                }}
+            }};
         '''
         replacement.append(script)
         return replacement
+
+    async def on_click(self):
+        print(f'got click, waiting 1s ...')
+        process = await asyncio.create_subprocess_shell(self.command, stdout=asyncio.subprocess.PIPE)
+        print(self.command, process)
+
+        stdout, _ = await process.communicate()
+
+        if process.returncode != 0:
+            raise print(
+                f'Failed to run command: {self.command}', file=sys.stderr)
+
+        print(f'sending response ...')
+        return {'stdout': stdout.decode('utf-8')}
 
 
 def get_pages(sio, pages_path):
