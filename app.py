@@ -50,6 +50,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
             widget = ButtonWidget(self, i, soup, element)
             element.replace_with(widget.replacement)
             self.widgets[widget.hash] = widget
+        self.html = soup.encode(formatter='html5').decode('utf-8')
 
     def __repr__(self):
         return f'<InteractivePage url=\'{self.url}\'>'
