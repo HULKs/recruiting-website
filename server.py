@@ -218,6 +218,7 @@ def get_pages(pages_path):
                 'base_url': base_url,
                 'url': os.path.join(base_url, f'{os.path.splitext(file)[0]}.html'),
             }
+            page['hash'] = hashlib.sha256(page['url'].encode('utf-8')).hexdigest()
             with open(markdown_path) as f:
                 markdown = f.read()
                 raw_html = markdown2.markdown(markdown)
@@ -287,6 +288,7 @@ def get_pages(pages_path):
                     'image_name': f'recruiting-website-{image_name_suffix}',
                 })
             except OSError as e:
+                # TODO: if e.errno == 2: pass
                 print(f'Skipping to build a docker image: {str(e)}')
 
             pages.append(page)
@@ -298,9 +300,9 @@ class WorkerController:
     """tries to run all required containers and receives data from proxy"""
 
     def __init__(self, pages):
-        # maintains its state (requested workers, running workers)
         self.pages = pages
         self.event = asyncio.Event()
+        self.running_workers = {}
         self.requested_workers = {}
         pass
 
@@ -319,19 +321,89 @@ class WorkerController:
                 pass
 
     async def run(self):
+        asyncio.create_task(self.read_docker_events())
         # init: collect running containers
         # diff the requested againts running workers
         while True:
             await self.event.wait()
             self.event.clear()
+            await self.update_running_docker_containers()
+            to_create, to_remove = self.diff_workers()
+            for worker in to_create:
+                await self.start_worker(worker)
+            for worker in to_remove:
+                await self.stop_worker(worker)
         # apply changes: start, stop containers and processes
         # also: forward IO
         pass
 
-    def create_worker(self, worker_uuid, path_uuid, channels):
+    async def stdout_of(self, *args):
+        process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE)
+        print(*args, process)
+
+        stdout, _ = await process.communicate()
+
+        if process.returncode != 0:
+            raise RuntimeError(f'Failed to run command: {" ".join(args)}')
+
+        return stdout
+
+    async def update_running_docker_containers(self):
+        container_ids = await self.stdout_of('docker', 'container', 'ls', '--all', '--format={{json .ID}}')
+
+        if len(container_ids) == 0:
+            self.running_workers = []
+            return
+
+        container_ids = [json.loads(container_id)
+                         for container_id in container_ids.splitlines()]
+        container_metadata = json.loads(await self.stdout_of('docker', 'inspect', *container_ids))
+
+        running_workers = {}
+        for metadata in container_metadata:
+            name = re.match(
+                r'/recruiting-website-([A-Za-z0-9-]+)', metadata['Name'])
+            if name is not None and metadata['State']['Running'] and not metadata['State']['Paused']:
+                running_workers[name.group(1)] = {
+                    'id': metadata['Id'],
+                }
+        self.running_workers = running_workers
+
+    async def start_worker(self, worker_uuid):
+        pass
+
+    async def stop_worker(self, worker_uuid):
+        pass
+
+    def diff_workers(self):
+        return \
+            set(self.requested_workers.keys()) - set(self.running_workers.keys()), \
+            set(self.running_workers.keys()) - set(self.requested_workers.keys())
+
+    async def read_docker_events(self):
+        async def read_stdout(self, stdout: asyncio.StreamReader):
+            while True:
+                buffer = await stdout.readline()
+                if not buffer:
+                    break
+                # currently ignore the buffer (use the buffer in the future to update the running containers)
+                self.event.set()
+
+        process = await asyncio.create_subprocess_exec('docker', 'events', '--format={{json .}}', stdout=asyncio.subprocess.PIPE)
+        print(process)
+
+        read_stdout_task = asyncio.create_task(
+            read_stdout(self, process.stdout))
+        process_task = asyncio.create_task(process.wait())
+
+        # this will return when e.g. the docker process dies
+        # therefore skipping error handling here and let exceptions bring the parent process down
+        # await asyncio.gather(read_stdout_task, read_stderr_task, process_task)
+
+    def create_worker(self, worker_uuid, page_hash, channels):
         # mutate requested workers
         self.requested_workers[worker_uuid] = {
-            'path_uuid': path_uuid,
+            'page_hash': page_hash,
             'commands': [],  # TODO: get commands
             'channels': channels,
         }
@@ -357,7 +429,7 @@ class ClientConnector:
         # TODO: forward IO, needed, because tasks are forwarding IO
         pass
 
-    def create_client(self, client_uuid, worker_uuid, path_uuid, channels):
+    def create_client(self, client_uuid, worker_uuid, page_hash, channels):
         self.clients[client_uuid] = {
             'worker': worker_uuid,
             'channels': channels,
@@ -373,7 +445,7 @@ class ClientConnector:
                 'reference_count': 1,
                 'channels': channels,
             }
-            self.worker_controller.create_worker(worker_uuid, path_uuid)
+            self.worker_controller.create_worker(worker_uuid, page_hash)
 
     def remove_client(self, client_uuid):
         worker_uuid = self.clients[client_uuid]['worker']
@@ -397,7 +469,9 @@ class Proxy:
 async def main():
     pages = get_pages('pages')
     worker_controller = WorkerController(pages)
-    await worker_controller.build_images()
+    # await worker_controller.build_images()
+    await worker_controller.update_running_docker_containers()
+    print(worker_controller.running_workers)
 
 
 if __name__ == '__main__':
