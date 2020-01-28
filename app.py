@@ -47,8 +47,8 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         self.widgets = {}
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
         for i, element in enumerate(soup.find_all('x-button')):
-            widget = ButtonWidget(self, i, soup, element)
-            element.replace_with(widget.replacement)
+            widget = ButtonWidget(self, i, element)
+            element.replace_with(widget.get_replacement(soup))
             self.widgets[widget.hash] = widget
         self.html = soup.encode(formatter='html5').decode('utf-8')
 
@@ -74,26 +74,25 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
 
 
 class ButtonWidget:
-    def __init__(self, page: InteractivePage, i: int, soup: bs4.BeautifulSoup, element):
+    def __init__(self, page: InteractivePage, i: int, element):
         self.page = page
-        self.soup = soup
         self.title = element.string
         self.command = element['command']
         self.hash = hashlib.sha256(
             f'{self.page.hash}-{self.title}-{self.command}-{i}'.encode('utf-8')).hexdigest()
-        self.construct_replacement()
 
     def __repr__(self):
         return f'<ButtonWidget title=\'{self.title}\', command=\'{self.command}\'>'
 
-    def construct_replacement(self):
-        self.replacement = self.soup.new_tag('div')
-        h1 = self.soup.new_tag('h1')
+    def get_replacement(self, soup):
+        replacement = soup.new_tag('div')
+        h1 = soup.new_tag('h1')
         h1.string = 'Button'
-        self.replacement.append(h1)
-        button = self.soup.new_tag('button')
+        replacement.append(h1)
+        button = soup.new_tag('button')
         button.string = self.title
-        self.replacement.append(button)
+        replacement.append(button)
+        return replacement
 
 
 def get_pages(sio, pages_path):
@@ -130,7 +129,7 @@ if __name__ == '__main__':
     pages = get_pages(sio, 'pages')
     print('pages:')
     for page in pages:
-        print(' ', page.url, page)
+        print(' ',page)
         if isinstance(page, InteractivePage):
             sio.register_namespace(page)
             print('    widgets:', page.widgets)
