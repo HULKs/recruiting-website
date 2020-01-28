@@ -31,11 +31,15 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
     def __init__(self, url: str, page_path: str):
         StaticPage.__init__(self, url, page_path)
         socketio.AsyncNamespace.__init__(self, namespace=url)
+        self.hash = hashlib.sha256(url.encode('utf-8')).hexdigest()
         self.connected_clients = 0
         self.widgets = {}
-        # soup = bs4.BeautifulSoup(self.html, 'html.parser')
+        soup = bs4.BeautifulSoup(self.html, 'html.parser')
+        for i, element in enumerate(soup.find_all('x-button')):
+            widget = ButtonWidget(self, i, soup, element)
+            self.widgets[widget.hash] = widget
     
-    def on_set_uuid(self, sid, uuid):
+    def on_set_uuid(self, sid: str, uuid):
         print(f'{sid} set uuid {uuid}')
         self.enter_room(sid, uuid)
         self.connected_clients += 1
@@ -44,7 +48,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         else:
             print(f'start worker {uuid} for {sid}')
     
-    def on_disconnect(self, sid):
+    def on_disconnect(self, sid: str):
         print(f'{sid} disconnected')
         self.connected_clients -= 1
         if self.connected_clients > 0:
@@ -52,8 +56,12 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         else:
             print(f'stop worker from {sid}')
 
-# class ButtonWidget:
-    
+class ButtonWidget:
+    def __init__(self, page: InteractivePage, i: int, soup: bs4.BeautifulSoup, element):
+        self.page = page
+        self.title = element.string
+        self.command = element['command']
+        self.hash = hashlib.sha256(f'{self.page.hash}-{self.title}-{self.command}-{i}'.encode('utf-8')).hexdigest()
 
 def get_pages(sio, pages_path):
     pages_path = os.path.abspath(pages_path)
@@ -72,6 +80,7 @@ def get_pages(sio, pages_path):
                 page = InteractivePage(url, page_path)
                 pages.append(page)
             except OSError as e:
+                # errno 2: No such file or directory
                 if e.errno != 2:
                     raise
                 page = StaticPage(url, page_path)
@@ -88,6 +97,7 @@ if __name__ == '__main__':
         print(' ', page.url, page)
         if isinstance(page, InteractivePage):
             sio.register_namespace(page)
+            print('    widgets:', page.widgets)
         print('    routes:', page.routes)
         app.add_routes(page.routes)
     web.run_app(app)
