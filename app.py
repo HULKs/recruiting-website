@@ -56,15 +56,15 @@ class StaticPage:
 
 
 class InteractivePage(StaticPage, socketio.AsyncNamespace):
-    class Worker:
+    class Container:
         def __init__(self, uuid):
             self.uuid = uuid
             self.stop_event = asyncio.Event()
-            print(uuid, 'starting worker ...')
-            self.task = asyncio.create_task(self.worker())
+            print(uuid, 'starting container ...')
+            self.task = asyncio.create_task(self.container())
 
-        async def worker(self):
-            print(self.uuid, 'entering worker')
+        async def container(self):
+            print(self.uuid, 'entering container')
 
             while True:
                 process = await asyncio.create_subprocess_exec('tail', '-f', '/dev/null')
@@ -91,10 +91,10 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
                 print(self.uuid, process, 'terminated, restarting ...')
                 stop_task.cancel()
 
-            print(self.uuid, 'exiting worker')
+            print(self.uuid, 'exiting container')
 
         async def stop(self):
-            print(self.uuid, 'stopping worker ...')
+            print(self.uuid, 'stopping container ...')
             self.stop_event.set()
             await self.task
 
@@ -103,7 +103,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         socketio.AsyncNamespace.__init__(self, namespace=url)
         self.hash = hashlib.sha256(url.encode('utf-8')).hexdigest()
         self.clients = {}
-        self.workers = {}
+        self.containers = {}
         self.widgets = {}
 
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
@@ -163,14 +163,14 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
 
     def on_set_uuid(self, sid: str, uuid):
         print(f'{sid} set uuid {uuid}')
-        if re.match(r'[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89AB][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}', uuid) is None:
+        if re.match(r'[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}', uuid, flags=re.IGNORECASE) is None:
             print(f'Invalid UUID from {sid}: {uuid}', file=sys.stderr)
             return
         self.enter_room(sid, uuid)
         self.clients[sid] = uuid
-        # TODO: this does not detect a stopping worker
-        if uuid not in self.workers:
-            self.workers[uuid] = InteractivePage.Worker(uuid)
+        # TODO: this does not detect a stopping container
+        if uuid not in self.containers:
+            self.containers[uuid] = InteractivePage.Container(uuid)
 
     async def on_disconnect(self, sid: str):
         print(f'{sid} disconnected')
@@ -179,8 +179,8 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         remaining_clients = sum(
             [1 for client_uuid in self.clients.values() if client_uuid == uuid])
         if remaining_clients == 0:
-            await self.workers[uuid].stop()
-            del self.workers[uuid]
+            await self.containers[uuid].stop()
+            del self.containers[uuid]
 
     async def on_button_click(self, sid: str, data):
         print(f'Button click of {sid}:', data)
@@ -195,6 +195,16 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
                     f'Failed to send click to {widget_hash} (no widget or wrong type)', data, file=sys.stderr)
         except KeyError:
             print(f'Failed to extract hash of widget', data, file=sys.stderr)
+
+    async def build_image(self):
+        print(f'Building container image for {self.page_path} ...')
+
+        process = await asyncio.create_subprocess_exec('docker', 'build', '--pull', '--tag', f'recruiting-website-{self.hash}', self.page_path)
+
+        await process.wait()
+
+        if process.returncode != 0:
+            raise RuntimeError('Failed to build docker image')
 
 
 class ButtonWidget:
@@ -275,7 +285,7 @@ def get_pages(sio, pages_path):
     return pages
 
 
-if __name__ == '__main__':
+async def app_factory():
     sio = socketio.AsyncServer(
         logger=True, async_mode='aiohttp', cors_allowed_origins='*')
     app = web.Application()
@@ -284,9 +294,14 @@ if __name__ == '__main__':
     print('pages:')
     for page in pages:
         print(' ', page)
+        print('    routes:', page.routes)
+        app.add_routes(page.routes)
         if isinstance(page, InteractivePage):
             sio.register_namespace(page)
             print('    widgets:', page.widgets)
-        print('    routes:', page.routes)
-        app.add_routes(page.routes)
-    web.run_app(app)
+            await page.build_image()
+    return app
+
+
+if __name__ == '__main__':
+    web.run_app(app_factory())
