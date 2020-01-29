@@ -56,52 +56,11 @@ class StaticPage:
 
 
 class InteractivePage(StaticPage, socketio.AsyncNamespace):
-    class Container:
-        def __init__(self, uuid):
-            self.uuid = uuid
-            self.stop_event = asyncio.Event()
-            print(uuid, 'starting container ...')
-            self.task = asyncio.create_task(self.container())
-
-        async def container(self):
-            print(self.uuid, 'entering container')
-
-            while True:
-                process = await asyncio.create_subprocess_exec('tail', '-f', '/dev/null')
-                print(self.uuid, process)
-
-                process_task = asyncio.create_task(process.wait())
-                stop_task = asyncio.create_task(self.stop_event.wait())
-
-                print(self.uuid, process, 'waiting ...')
-                done, _ = await asyncio.wait([process_task, stop_task], return_when=asyncio.FIRST_COMPLETED)
-
-                if stop_task in done:
-                    process.terminate()
-                    print(self.uuid, process,
-                          'waiting to terminate (timeout: 5s) ...')
-                    await asyncio.wait_for(process_task, timeout=5.0)
-                    print(self.uuid, process, 'testing if terminated ...')
-                    if process.returncode is None:
-                        print(self.uuid, process,
-                              'kill because not terminated yet ...')
-                        process.kill()
-                    break
-
-                print(self.uuid, process, 'terminated, restarting ...')
-                stop_task.cancel()
-
-            print(self.uuid, 'exiting container')
-
-        async def stop(self):
-            print(self.uuid, 'stopping container ...')
-            self.stop_event.set()
-            await self.task
-
     def __init__(self, pages_path: str, url: str, page_path: str):
         StaticPage.__init__(self, pages_path, url, page_path)
         socketio.AsyncNamespace.__init__(self, namespace=url)
         self.hash = hashlib.sha256(url.encode('utf-8')).hexdigest()
+        self.image_name = f'recruiting-website-{self.hash}'
         self.clients = {}
         self.containers = {}
         self.widgets = {}
@@ -170,7 +129,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         self.clients[sid] = uuid
         # TODO: this does not detect a stopping container
         if uuid not in self.containers:
-            self.containers[uuid] = InteractivePage.Container(uuid)
+            self.containers[uuid] = Container(self, uuid)
 
     async def on_disconnect(self, sid: str):
         print(f'{sid} disconnected')
@@ -199,12 +158,67 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
     async def build_image(self):
         print(f'Building container image for {self.page_path} ...')
 
-        process = await asyncio.create_subprocess_exec('docker', 'build', '--pull', '--tag', f'recruiting-website-{self.hash}', self.page_path)
+        process = await asyncio.create_subprocess_exec('docker', 'build', '--pull', '--tag', self.image_name, self.page_path)
 
         await process.wait()
 
         if process.returncode != 0:
             raise RuntimeError('Failed to build docker image')
+
+
+class Container:
+    def __init__(self, page: InteractivePage, uuid: str):
+        self.page = page
+        self.uuid = uuid
+        self.container_name = f'recruiting-website-{self.page.hash}-{self.uuid}'
+        self.stop_event = asyncio.Event()
+        print(uuid, 'starting container ...')
+        self.task = asyncio.create_task(self.container())
+
+    async def container(self):
+        print(self.uuid, 'entering container')
+
+        while True:
+            # https://stackoverflow.com/a/35770783
+            process = await asyncio.create_subprocess_exec(
+                'docker',
+                'run',
+                '--rm',
+                '--name', self.container_name,
+                '--network=none', self.page.image_name,
+                'sh',
+                '-c',
+                'trap : TERM INT; (while true; do sleep 86400; done) & wait'
+            )
+            print(self.uuid, process)
+
+            process_task = asyncio.create_task(process.wait())
+            stop_task = asyncio.create_task(self.stop_event.wait())
+
+            print(self.uuid, process, 'waiting ...')
+            done, _ = await asyncio.wait([process_task, stop_task], return_when=asyncio.FIRST_COMPLETED)
+
+            if stop_task in done:
+                process.terminate()
+                print(self.uuid, process,
+                      'waiting to terminate (timeout: 5s) ...')
+                await asyncio.wait_for(process_task, timeout=5.0)
+                print(self.uuid, process, 'testing if terminated ...')
+                if process.returncode is None:
+                    print(self.uuid, process,
+                          'kill because not terminated yet ...')
+                    process.kill()
+                break
+
+            print(self.uuid, process, 'terminated, restarting ...')
+            stop_task.cancel()
+
+        print(self.uuid, 'exiting container')
+
+    async def stop(self):
+        print(self.uuid, 'stopping container ...')
+        self.stop_event.set()
+        await self.task
 
 
 class ButtonWidget:
