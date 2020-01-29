@@ -96,10 +96,10 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
                     console.log('connect');
                     socket.emit('set_uuid', uuid);
                 }});
-                let button_callbacks = {{}};
+                let buttonCallbacks = {{}};
                 socket.on('button_stdout', data => {{
-                    if (data.hash && button_callbacks[data.hash]) {{
-                        button_callbacks[data.hash](data);
+                    if (data.hash && buttonCallbacks[data.hash]) {{
+                        buttonCallbacks[data.hash](data);
                     }} else {{
                         console.error('Failed to send to widget', data);
                     }}
@@ -177,7 +177,7 @@ class ButtonWidget:
                 console.log('Click of {self.hash}');
                 socket.emit('button_click', {{ 'hash': '{self.hash}' }});
             }};
-            button_callbacks['{self.hash}'] = data => {{
+            buttonCallbacks['{self.hash}'] = data => {{
                 console.log('Got response:', data);
                 if (data.stdout) {{
                     document.getElementById('button-output-{self.hash}').innerText = data.stdout;
