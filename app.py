@@ -87,7 +87,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
                     }}
                     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, getRandomSymbol);
                 }}
-                if (location.hash.length !== 37) {{
+                if (location.hash.match(new RegExp(/^#[0-9A-F]{{8}}-[0-9A-F]{{4}}-4[0-9A-F]{{3}}-[89AB][0-9A-F]{{3}}-[0-9A-F]{{12}}$/i))) {{
                     location.hash = `#${{uuidv4()}}`;
                 }}
                 const uuid = location.hash.substr(1);
@@ -119,7 +119,9 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
 
     def on_set_uuid(self, sid: str, uuid):
         print(f'{sid} set uuid {uuid}')
-        # TODO: validate uuid
+        if re.match(r'[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89AB][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}', uuid) is None:
+            print(f'Invalid UUID from {sid}: {uuid}', file=sys.stderr)
+            return
         self.enter_room(sid, uuid)
         self.connected_clients += 1
         if self.connected_clients > 1:
