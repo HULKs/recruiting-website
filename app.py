@@ -56,11 +56,54 @@ class StaticPage:
 
 
 class InteractivePage(StaticPage, socketio.AsyncNamespace):
+    class Worker:
+        def __init__(self, uuid):
+            self.uuid = uuid
+            self.stop_event = asyncio.Event()
+            print(uuid, 'starting worker ...')
+            self.task = asyncio.create_task(self.worker())
+
+        async def worker(self):
+            print(self.uuid, 'entering worker')
+
+            while True:
+                process = await asyncio.create_subprocess_exec('tail', '-f', '/dev/null')
+                print(self.uuid, process)
+
+                process_task = asyncio.create_task(process.wait())
+                stop_task = asyncio.create_task(self.stop_event.wait())
+
+                print(self.uuid, process, 'waiting ...')
+                done, _ = await asyncio.wait([process_task, stop_task], return_when=asyncio.FIRST_COMPLETED)
+
+                if stop_task in done:
+                    process.terminate()
+                    print(self.uuid, process,
+                          'waiting to terminate (timeout: 5s) ...')
+                    await asyncio.wait_for(process_task, timeout=5.0)
+                    print(self.uuid, process, 'testing if terminated ...')
+                    if process.returncode is None:
+                        print(self.uuid, process,
+                              'kill because not terminated yet ...')
+                        process.kill()
+                    break
+
+                print(self.uuid, process, 'terminated, restarting ...')
+                stop_task.cancel()
+
+            print(self.uuid, 'exiting worker')
+
+        async def stop(self):
+            print(self.uuid, 'stopping worker ...')
+            self.stop_event.set()
+            await self.task
+
     def __init__(self, pages_path: str, url: str, page_path: str):
         StaticPage.__init__(self, pages_path, url, page_path)
         socketio.AsyncNamespace.__init__(self, namespace=url)
         self.hash = hashlib.sha256(url.encode('utf-8')).hexdigest()
-        self.connected_clients = 0
+        self.clients = {}
+        self.workers = {}
         self.widgets = {}
 
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
@@ -87,7 +130,8 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
                     }}
                     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, getRandomSymbol);
                 }}
-                if (location.hash.match(new RegExp(/^#[0-9A-F]{{8}}-[0-9A-F]{{4}}-4[0-9A-F]{{3}}-[89AB][0-9A-F]{{3}}-[0-9A-F]{{12}}$/i))) {{
+                // https://gist.github.com/johnelliott/cf77003f72f889abbc3f32785fa3df8d
+                if (!location.hash.match(new RegExp(/^#[0-9A-F]{{8}}-[0-9A-F]{{4}}-4[0-9A-F]{{3}}-[89AB][0-9A-F]{{3}}-[0-9A-F]{{12}}$/i))) {{
                     location.hash = `#${{uuidv4()}}`;
                 }}
                 const uuid = location.hash.substr(1);
@@ -123,19 +167,20 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
             print(f'Invalid UUID from {sid}: {uuid}', file=sys.stderr)
             return
         self.enter_room(sid, uuid)
-        self.connected_clients += 1
-        if self.connected_clients > 1:
-            print(f'attach {sid} to worker {uuid}')
-        else:
-            print(f'start worker {uuid} for {sid}')
+        self.clients[sid] = uuid
+        # TODO: this does not detect a stopping worker
+        if uuid not in self.workers:
+            self.workers[uuid] = InteractivePage.Worker(uuid)
 
-    def on_disconnect(self, sid: str):
+    async def on_disconnect(self, sid: str):
         print(f'{sid} disconnected')
-        self.connected_clients -= 1
-        if self.connected_clients > 0:
-            print(f'detach {sid} from worker')
-        else:
-            print(f'stop worker from {sid}')
+        uuid = self.clients[sid]
+        del self.clients[sid]
+        remaining_clients = sum(
+            [1 for client_uuid in self.clients.values() if client_uuid == uuid])
+        if remaining_clients == 0:
+            await self.workers[uuid].stop()
+            del self.workers[uuid]
 
     async def on_button_click(self, sid: str, data):
         print(f'Button click of {sid}:', data)
