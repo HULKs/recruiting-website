@@ -176,7 +176,7 @@ class Container:
         self.task = asyncio.create_task(self.container())
 
     async def container(self):
-        print(self.uuid, 'entering container')
+        print(self.uuid, 'entering container loop')
 
         while True:
             # https://stackoverflow.com/a/35770783
@@ -190,12 +190,11 @@ class Container:
                 '-c',
                 'trap : TERM INT; (while true; do sleep 86400; done) & wait'
             )
-            print(self.uuid, process)
 
             process_task = asyncio.create_task(process.wait())
             stop_task = asyncio.create_task(self.stop_event.wait())
 
-            print(self.uuid, process, 'waiting ...')
+            print(self.uuid, process, 'listening for state changes ...')
             done, _ = await asyncio.wait([process_task, stop_task], return_when=asyncio.FIRST_COMPLETED)
 
             if stop_task in done:
@@ -213,7 +212,7 @@ class Container:
             print(self.uuid, process, 'terminated, restarting ...')
             stop_task.cancel()
 
-        print(self.uuid, 'exiting container')
+        print(self.uuid, 'exiting container loop')
 
     async def stop(self):
         print(self.uuid, 'stopping container ...')
