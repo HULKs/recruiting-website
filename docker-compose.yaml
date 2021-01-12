@@ -1,8 +1,0 @@
-version: "3"
-services:
-  nginx:
-    image: recruiting-website-nginx
-    build: .
-    ports:
-    - "80:80"
-    # network_mode: none
