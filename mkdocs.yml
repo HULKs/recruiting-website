@@ -1,0 +1,4 @@
+site_name: Recruiting Website
+theme: recruiting_website
+plugins:
+- interactive_widgets
