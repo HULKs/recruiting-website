@@ -63,6 +63,7 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         self.image_name = f'recruiting-website-{self.hash}'
         self.clients = {}
         self.containers = {}
+        self.volumes = []
         self.widgets = {}
 
         soup = bs4.BeautifulSoup(self.html, 'html.parser')
@@ -100,7 +101,8 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
                     socket.emit('set_uuid', uuid);
                 }});
                 let buttonCallbacks = {{}};
-                socket.on('button_stdout', data => {{
+                socket.on('button_response', data => {{
+                    console.log(data);
                     if (data.hash && buttonCallbacks[data.hash]) {{
                         buttonCallbacks[data.hash](data);
                     }} else {{
@@ -120,16 +122,18 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
     def on_connect(self, sid: str, environment):
         print(f'{sid} connected')
 
-    def on_set_uuid(self, sid: str, uuid):
+    async def on_set_uuid(self, sid: str, uuid):
         print(f'{sid} set uuid {uuid}')
         if re.match(r'[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}', uuid, flags=re.IGNORECASE) is None:
-            print(f'Invalid UUID from {sid}: {uuid}', file=sys.stderr)
-            return
+            raise RuntimeError(f'Invalid UUID from {sid}: {uuid}')
         self.enter_room(sid, uuid)
         self.clients[sid] = uuid
-        # TODO: this does not detect a stopping container
-        if uuid not in self.containers:
-            self.containers[uuid] = Container(self, uuid)
+        # TODO: race condition possible
+        if uuid not in self.volumes:
+            self.volumes.append(uuid)
+            await self.create_volume(uuid)
+        # if uuid not in self.containers:
+        #     self.containers[uuid] = Container(self, uuid)
 
     async def on_disconnect(self, sid: str):
         print(f'{sid} disconnected')
@@ -138,32 +142,52 @@ class InteractivePage(StaticPage, socketio.AsyncNamespace):
         remaining_clients = sum(
             [1 for client_uuid in self.clients.values() if client_uuid == uuid])
         if remaining_clients == 0:
-            await self.containers[uuid].stop()
-            del self.containers[uuid]
+            # TODO: race condition possible
+            self.volumes.remove(uuid)
+            await self.remove_volume(uuid)
 
     async def on_button_click(self, sid: str, data):
         print(f'Button click of {sid}:', data)
+        uuid = self.clients[sid]
         try:
             widget_hash = data['hash']
-            try:
-                response = await self.widgets[widget_hash].on_click()
-                response['hash'] = widget_hash
-                await self.emit('button_stdout', response)
-            except (KeyError, AttributeError):
-                print(
-                    f'Failed to send click to {widget_hash} (no widget or wrong type)', data, file=sys.stderr)
+            # try:
+            response = await self.widgets[widget_hash].on_click(uuid)
+            response['hash'] = widget_hash
+            print('response:', response)
+            await self.emit('button_response', response)
+            # except (KeyError, AttributeError):
+            #     print(
+            #         f'Failed to send click to {widget_hash} (no widget or wrong type)', data, file=sys.stderr)
         except KeyError:
             print(f'Failed to extract hash of widget', data, file=sys.stderr)
 
     async def build_image(self):
         print(f'Building container image for {self.page_path} ...')
-
         process = await asyncio.create_subprocess_exec('docker', 'build', '--pull', '--tag', self.image_name, self.page_path)
-
         await process.wait()
-
         if process.returncode != 0:
             raise RuntimeError('Failed to build docker image')
+
+    def runtime_hash(self, uuid: str):
+        return hashlib.sha256(f'{self.hash}-{uuid}'.encode('utf-8')).hexdigest()
+
+    def get_volume_name_by_uuid(self, uuid: str):
+        return f'recruiting-website-{self.runtime_hash(uuid)}'
+
+    async def create_volume(self, uuid: str):
+        print(f'Creating volume for {uuid} ...')
+        process = await asyncio.create_subprocess_exec('docker', 'volume', 'create', self.get_volume_name_by_uuid(uuid))
+        await process.wait()
+        if process.returncode != 0:
+            raise RuntimeError('Failed to create docker volume')
+
+    async def remove_volume(self, uuid: str):
+        print(f'Removing volume for {uuid} ...')
+        process = await asyncio.create_subprocess_exec('docker', 'volume', 'rm', self.get_volume_name_by_uuid(uuid))
+        await process.wait()
+        if process.returncode != 0:
+            raise RuntimeError('Failed to remove docker volume')
 
 
 class Container:
@@ -225,8 +249,7 @@ class ButtonWidget:
         self.page = page
         self.title = element.string
         self.command = element['command']
-        self.hash = hashlib.sha256(
-            f'{self.page.hash}-{self.title}-{self.command}-{i}'.encode('utf-8')).hexdigest()
+        self.hash = hashlib.sha256(f'{self.page.hash}-{self.title}-{self.command}-{i}'.encode('utf-8')).hexdigest()
 
     def __repr__(self):
         return f'<ButtonWidget title=\'{self.title}\', command=\'{self.command}\'>'
@@ -257,19 +280,36 @@ class ButtonWidget:
         replacement.append(script)
         return replacement
 
-    async def on_click(self):
+    def runtime_hash(self, uuid: str):
+        return hashlib.sha256(f'{self.hash}-{uuid}'.encode('utf-8')).hexdigest()
+
+    def get_container_name_by_uuid(self, uuid: str):
+        return f'recruiting-website-{self.runtime_hash(uuid)}'
+
+    async def on_click(self, uuid: str):
         print(f'got click, waiting 1s ...')
-        process = await asyncio.create_subprocess_shell(self.command, stdout=asyncio.subprocess.PIPE)
+        process = await asyncio.create_subprocess_exec(
+            'docker',
+            'run',
+            '--rm',
+            '--name', self.get_container_name_by_uuid(uuid),
+            '--network=none',
+            '--mount', f'src={self.page.get_volume_name_by_uuid(uuid)},dst=/data',
+            self.page.image_name,
+            'sh',
+            '-c',
+            self.command,
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
         print(self.command, process)
-
-        stdout, _ = await process.communicate()
-
+        stdout, stderr = await process.communicate()
         if process.returncode != 0:
-            raise print(
-                f'Failed to run command: {self.command}', file=sys.stderr)
-
+            raise RuntimeError(f'Failed to run command: {self.command}')
         print(f'sending response ...')
-        return {'stdout': stdout.decode('utf-8')}
+        return {
+            'stdout': stdout.decode('utf-8'), 
+            'stderr': stderr.decode('utf-8'),
+        }
 
 
 def get_pages(sio, pages_path):
