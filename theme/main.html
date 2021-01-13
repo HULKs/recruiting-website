@@ -1,9 +1,92 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>{% if page.title %}{{ page.title }} - {% endif %}{{ config.site_name }}</title>
-  </head>
-  <body>
+<html lang="{{ config.theme.language }}">
+
+<head>
+    <meta charset="utf-8" />
+    {% if config.site_favicon %}
+    <link rel="icon" href="{{ config.site_favicon | url }}" />
+    <link rel="shortcut icon" href="{{ config.site_favicon | url }}">
+    {% endif %}
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    {% if page and page.is_homepage and config.site_description %}
+    <meta name="description" content="{{ config.site_description }}" />
+    {% endif %}
+    {% if config.site_author %}
+    <meta name="author" content="{{ config.site_author }}" />
+    {% endif %}
+    {% if page and page.canonical_url %}
+    <link rel="canonical" href="{{ page.canonical_url }}" />
+    {% endif %}
+    <!-- <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" /> -->
+    <!-- <link rel="manifest" href="%PUBLIC_URL%/manifest.json" /> -->
+
+    <title>
+        {% if page and page.title and not page.is_homepage %}{{ page.title }} - {% endif %}{{ config.site_name }}
+    </title>
+
+    <link rel="stylesheet" href="{{ 'index.css' | url }}" />
+    <style type="text/css">
+        @font-face {
+            font-family: 'Inter';
+            src: local('Inter'), url('{{ './fonts/Inter-Bold-slnt=0.ttf' | url }}') format('truetype');
+            font-weight: 700;
+        }
+        @font-face {
+            font-family: 'Inter';
+            src: local('Inter'), url('{{ './fonts/Inter-Regular-slnt=0.ttf' | url }}') format('truetype');
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            src: local('JetBrains Mono'), url('{{ './fonts/JetBrainsMono-Bold-Italic.ttf' | url }}') format('truetype');
+            font-weight: 700;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            src: local('JetBrains Mono'), url('{{ './fonts/JetBrainsMono-Bold.ttf' | url }}') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            src: local('JetBrains Mono'), url('{{ './fonts/JetBrainsMono-Italic.ttf' | url }}') format('truetype');
+            font-weight: 400;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            src: local('JetBrains Mono'), url('{{ './fonts/JetBrainsMono-Regular.ttf' | url }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+    </style>
+    <!-- <link href="{{ 'css/bootstrap.min.css'|url }}" rel="stylesheet">
+    <link href="{{ 'css/font-awesome.min.css'|url }}" rel="stylesheet">
+    <link href="{{ 'css/base.css'|url }}" rel="stylesheet">
+    {%- if config.theme.highlightjs %}
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/{{ config.theme.hljs_style }}.min.css">
+    {%- endif %}
+    {%- for path in config['extra_css'] %}
+    <link href="{{ path|url }}" rel="stylesheet">
+    {%- endfor %} -->
+
+
+    <!-- <script src="{{ 'js/jquery-1.10.2.min.js'|url }}" defer></script>
+    <script src="{{ 'js/bootstrap.min.js'|url }}" defer></script>
+    {%- if config.theme.highlightjs %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    {%- for lang in config.theme.hljs_languages %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/{{lang}}.min.js"></script>
+    {%- endfor %}
+    <script>hljs.initHighlightingOnLoad();</script>
+    {%- endif %} -->
+</head>
+
+<body class="centered">
     {{ page.content }}
-  </body>
+</body>
+
 </html>
