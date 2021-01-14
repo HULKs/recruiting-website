@@ -400,9 +400,17 @@ html, body {
   background-color: rgba(0, 0, 0, 0.125);
 }
 
+.interactive-widgets-text-editor .contents.with-error .buttons .hide-on-error {
+  display: none;
+}
+
 .interactive-widgets-text-editor .contents.with-error {
   display: flex;
   align-items: center;
+}
+
+.interactive-widgets-text-editor .contents.with-contents .error-container {
+  display: none;
 }
 
 .interactive-widgets-text-editor .contents.with-error .error-container {
@@ -450,6 +458,32 @@ html, body {
   align-items: stretch;
   align-content: stretch;
   overflow: hidden;
+}
+
+.interactive-widgets-text-editor .contents.with-error .editor {
+  display: none;
+}
+
+.interactive-widgets-text-editor .contents.with-contents .editor {
+  display: block;
+  flex-grow: 1;
+  position: relative;
+}
+
+.interactive-widgets-text-editor .contents.with-contents .editor .codeArea {
+  flex: 1 1 auto;
+  margin-top: 0;
+  height: 100%;
+  position: relative;
+}
+
+.interactive-widgets-text-editor .contents.with-contents .editor .CodeMirror {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
 }
 
 .interactive-widgets-text-editor .caption {
