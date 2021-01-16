@@ -173,7 +173,7 @@ html, body {
 .interactive-widgets-button {
   /* margin-top: 1rem;
   margin-bottom: 2rem; */
-  background-color: #eee;
+  background-color: #fdd;
   border-radius: 0.5rem;
   box-sizing: border-box;
   display: grid;
@@ -184,6 +184,10 @@ html, body {
   padding: 2vw;
   /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
   max-height: 43.578947368vw;
+}
+
+.interactive-widgets-button.open {
+  background-color: #eee;
 }
 
 .interactive-widgets-button button.button {
@@ -259,9 +263,13 @@ html, body {
   /* since .centered has 4vw margin it has (100vw - 8vw) width */
   /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
   height: 43.578947368vw;
-  background-color: #eee;
+  background-color: #fdd;
   border-radius: 0.5rem;
   box-sizing: border-box;
+}
+
+.interactive-widgets-image-viewer.open .contents {
+  background-color: #eee;
 }
 
 .interactive-widgets-image-viewer .contents.with-error {
@@ -321,7 +329,7 @@ html, body {
 .interactive-widgets-terminal {
   /* margin-top: 1rem;
   margin-bottom: 2rem; */
-  background-color: #eee;
+  background-color: #fdd;
   border-radius: 0.5rem;
   box-sizing: border-box;
   display: flex;
@@ -331,6 +339,10 @@ html, body {
   padding: 2vw;
   /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
   height: 43.578947368vw;
+}
+
+.interactive-widgets-terminal.open {
+  background-color: #eee;
 }
 
 .interactive-widgets-terminal .title {
@@ -355,9 +367,13 @@ html, body {
   /* since .centered has 4vw margin it has (100vw - 8vw) width */
   /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
   height: 43.578947368vw;
-  background-color: #eee;
+  background-color: #fdd;
   border-radius: 0.5rem;
   box-sizing: border-box;
+}
+
+.interactive-widgets-text-editor.open .contents {
+  background-color: #eee;
 }
 
 .interactive-widgets-text-editor .contents .buttons {
@@ -503,9 +519,13 @@ html, body {
   /* since .centered has 4vw margin it has (100vw - 8vw) width */
   /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
   height: 43.578947368vw;
-  background-color: #eee;
+  background-color: #fdd;
   border-radius: 0.5rem;
   box-sizing: border-box;
+}
+
+.interactive-widgets-text-viewer.open .contents {
+  background-color: #eee;
 }
 
 .interactive-widgets-text-viewer .contents.with-error {
