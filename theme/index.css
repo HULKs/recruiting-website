@@ -43,44 +43,41 @@ table {
 /* Custom rules: */
 
 html, body {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-size: 15px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.centered {
+body {
   margin: 0 4vw;
-}
-
-.centered {
   padding: 1rem 0 2rem 0;
 }
 
-.centered p {
+p {
   padding: 0.5rem 0 1.5rem 0;
 }
 
-.centered p>img:only-child {
+p>img:only-child {
   max-width: 100%;
 }
 
-.centered em {
+em {
   font-style: italic;
 }
 
-.centered strong {
+strong {
   font-weight: 700;
 }
 
-.centered hr {
+hr {
   margin: 1rem 0 2rem 0;
   height: 0.15rem;
   background-color: #ccc;
   border: none;
 }
 
-.centered blockquote {
+blockquote {
   padding: 0.5rem 1rem 1rem 1rem;
   margin-bottom: 1rem;
   box-shadow: inset 0.15rem 0 0 #ccc;
@@ -88,16 +85,16 @@ html, body {
   border-radius: 0 0.5rem 0.5rem 0;
 }
 
-.centered blockquote>*:last-child {
+blockquote>*:last-child {
   margin-bottom: 0;
   padding-bottom: 0;
 }
 
-.centered a {
+a {
   color: #1e88e5;
 }
 
-.centered table {
+table {
   margin: 0.5rem 0 1.5rem 0;
   background-color: #eee;
   border-radius: 0.5rem;
@@ -105,72 +102,329 @@ html, body {
   padding: 0.5rem 0;
 }
 
-.centered table th {
+table th {
   font-weight: 700;
   padding: 0.5rem 1rem;
 }
 
-.centered table td {
+table td {
   padding: 0.5rem 1rem;
 }
 
-.centered h1 {
+h1 {
   padding: 2rem 0 1.5rem 0;
+  font-weight: 700;
+  font-size: 3rem;
+}
+
+h2 {
+  padding: 0.5rem 0 1.5rem 0;
+  font-weight: 700;
+  font-size: 2.25rem;
+}
+
+h3 {
+  padding: 0.5rem 0 1.5rem 0;
   font-weight: 700;
   font-size: 2rem;
 }
 
-.centered h2 {
+h4 {
   padding: 0.5rem 0 1.5rem 0;
   font-weight: 700;
-  font-size: 1.85rem;
+  font-size: 1.75rem;
 }
 
-.centered h3 {
+h5 {
   padding: 0.5rem 0 1.5rem 0;
   font-weight: 700;
-  font-size: 1.7rem;
+  font-size: 1.5rem;
 }
 
-.centered h4 {
-  padding: 0.5rem 0 1.5rem 0;
-  font-weight: 700;
-  font-size: 1.55rem;
-}
-
-.centered h5 {
-  padding: 0.5rem 0 1.5rem 0;
-  font-weight: 700;
-  font-size: 1.4rem;
-}
-
-.centered h6 {
+h6 {
   padding: 0.5rem 0 1.5rem 0;
   font-weight: 700;
   font-size: 1.25rem;
 }
 
-.centered code {
-  font-family: 'JetBrains Mono';
+code {
+  font-family: "JetBrains Mono";
 }
 
-.centered pre {
+pre {
   padding: 0.5rem 0 1.5rem 0;
 }
 
-.centered ul {
+ul {
   padding: 0.5rem 0 1.5rem 1.5rem;
   list-style-type: disc;
   list-style-position: outside;
 }
 
-.centered ol {
+ol {
   padding: 0.5rem 0 1.5rem 1.5rem;
   list-style-type: decimal;
   list-style-position: outside;
 }
 
+.interactive-widgets-disconnected {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: center;
+  z-index: 42;
+}
+
+.interactive-widgets-disconnected div {
+  background-color: #f44336;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  border-radius: 1.75rem;
+  padding: 0.25rem 1.1rem 0.25rem 0.85rem;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.125), 0 3px 25px rgba(0, 0, 0, 0.125), 0 3px 12.5px rgba(0, 0, 0, 0.125);
+}
+
+.interactive-widgets-disconnected div svg {
+  width: 3rem;
+  height: 3rem;
+  fill: #fff;
+  margin-right: 0.35rem;
+}
+
+.interactive-widgets-disconnected div span {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-left: 0.35rem;
+}
+
+.interactive-widgets-box {
+  background-color: #eee;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.interactive-widgets-box.fixed {
+  /* since body has 4vw margin it has (100vw - 8vw) width */
+  /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
+  height: 43.578947368vw;
+}
+
+.interactive-widgets-box.min-content {
+  /* since body has 4vw margin it has (100vw - 8vw) width */
+  /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
+  max-height: 43.578947368vw;
+}
+
+.interactive-widgets-box>* {
+  display: none;
+}
+
+.interactive-widgets-box>*.show {
+  display: block;
+}
+
+.interactive-widgets-caption {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.interactive-widgets-box .buttons {
+  flex-direction: row;
+  align-items: stretch;
+  align-content: stretch;
+  background-color: #fff;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.125), 0 1px 3px rgba(0, 0, 0, 0.125), 0 2px 7px rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+}
+
+.interactive-widgets-box>.buttons.show {
+  display: flex;
+}
+
+.interactive-widgets-box .buttons button {
+  display: block;
+  white-space: nowrap;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.125s ease;
+}
+
+.interactive-widgets-box .buttons button:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.125), 0 3px 15px rgba(0, 0, 0, 0.125);
+}
+
+.interactive-widgets-box .buttons button:disabled {
+  background-color: rgba(0, 0, 0, 0.0825);
+  box-shadow: none;
+  cursor: unset;
+}
+
+.interactive-widgets-box .buttons .spacer {
+  align-self: center;
+  width: 1px;
+  height: 1.5rem;
+  background-color: rgba(0, 0, 0, 0.125);
+}
+
+.interactive-widgets-box .error {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.interactive-widgets-box>.error.show {
+  display: flex;
+}
+
+.interactive-widgets-box svg {
+  width: 2rem;
+  height: 2rem;
+  fill: #000;
+  margin-right: 0.35vw;
+}
+
+.interactive-widgets-box span {
+  color: #000;
+  font-weight: 700;
+  margin-left: 0.35vw;
+}
+
 .interactive-widgets-button {
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  grid-template-rows: min-content 1fr;
+  column-gap: 2vw;
+  row-gap: 2vw;
+  padding: 2vw;
+}
+
+.interactive-widgets-button .buttons {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+
+.interactive-widgets-button .command {
+  font-family: "JetBrains Mono";
+  line-height: 1.25rem;
+  align-self: center;
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.interactive-widgets-button .outputs {
+  line-height: 1.25rem;
+  grid-column: 1 / 3;
+  grid-row: 2 / 3;
+  overflow-y: auto;
+}
+
+.interactive-widgets-button .outputs .message {
+  font-style: italic;
+  color: #888;
+}
+
+.interactive-widgets-button .outputs .error {
+  font-style: italic;
+  color: #ee0000;
+}
+
+.interactive-widgets-button .outputs .stdout, .interactive-widgets-button .outputs .stderr {
+  font-family: "JetBrains Mono";
+}
+
+.interactive-widgets-button .outputs .stderr {
+  color: #ee0000;
+}
+
+.interactive-widgets-button .error {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+}
+
+.interactive-widgets-image-viewer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.interactive-widgets-text-editor {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: min-content 1fr;
+  column-gap: 2vw;
+  row-gap: 2vw;
+  padding: 2vw;
+}
+
+.interactive-widgets-text-editor .buttons {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  justify-self: start;
+}
+
+.interactive-widgets-text-editor .editor {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+}
+
+.interactive-widgets-text-editor .error {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+}
+
+.interactive-widgets-text-viewer {
+  overflow-y: auto;
+}
+
+.interactive-widgets-text-viewer .viewer {
+  box-sizing: border-box;
+  padding: 0.5rem;
+  grid-template-columns: min-content 1fr;
+  grid-auto-rows: minmax(min-content, max-content);
+  font-family: "JetBrains Mono";
+  line-height: 1.35rem;
+  overflow-x: hidden;
+}
+
+.interactive-widgets-text-viewer>.viewer.show {
+  display: grid;
+}
+
+.interactive-widgets-text-viewer .viewer .line-number {
+  padding: 0 1rem 0 0.75rem;
+  text-align: right;
+  opacity: 0.25;
+}
+
+.interactive-widgets-text-viewer .error {
+  height: 100%;
+}
+
+/* .interactive-widgets-image-viewer.open .contents {
+  background-color: #eee;
+} */
+
+.interactive-widgets-button-legacy {
   /* margin-top: 1rem;
   margin-bottom: 2rem; */
   background-color: #fdd;
@@ -186,11 +440,11 @@ html, body {
   max-height: 43.578947368vw;
 }
 
-.interactive-widgets-button.open {
+.interactive-widgets-button-legacy.open {
   background-color: #eee;
 }
 
-.interactive-widgets-button button.button {
+.interactive-widgets-button-legacy button.button {
   display: block;
   align-self: center;
   grid-column: 1 / 2;
@@ -209,11 +463,11 @@ html, body {
   transition: box-shadow 0.125s ease;
 }
 
-.interactive-widgets-button button.button:hover {
+.interactive-widgets-button-legacy button.button:hover {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.125), 0 3px 7px rgba(0, 0, 0, 0.125), 0 5px 15px rgba(0, 0, 0, 0.125), 0 3px 15px rgba(0, 0, 0, 0.125);
 }
 
-.interactive-widgets-button .command {
+.interactive-widgets-button-legacy .command {
   font-family: 'JetBrains Mono';
   line-height: 1.25rem;
   align-self: center;
@@ -221,7 +475,7 @@ html, body {
   grid-row: 1 / 2;
 }
 
-.interactive-widgets-button .status {
+.interactive-widgets-button-legacy .status {
   font-size: 0.85rem;
   font-weight: 700;
   line-height: 1.25rem;
@@ -230,37 +484,37 @@ html, body {
   grid-row: 1 / 2;
 }
 
-.interactive-widgets-button .outputs {
+.interactive-widgets-button-legacy .outputs {
   line-height: 1.25rem;
   grid-column: 1 / 4;
   grid-row: 2 / 3;
   overflow-y: auto;
 }
 
-.interactive-widgets-button .outputs .message {
+.interactive-widgets-button-legacy .outputs .message {
   font-style: italic;
   color: #888;
 }
 
-.interactive-widgets-button .outputs .error {
+.interactive-widgets-button-legacy .outputs .error {
   font-style: italic;
   color: #ee0000;
 }
 
-.interactive-widgets-button .outputs .stdout, .interactive-widgets-button .outputs .stderr {
+.interactive-widgets-button-legacy .outputs .stdout, .interactive-widgets-button-legacy .outputs .stderr {
   font-family: 'JetBrains Mono';
 }
 
-.interactive-widgets-button .outputs .stderr {
+.interactive-widgets-button-legacy .outputs .stderr {
   color: #ee0000;
 }
 
-/* .interactive-widgets-image-viewer {
+/* .interactive-widgets-image-viewer-legacy {
   padding: 1rem 0 2rem 0;
 } */
 
-.interactive-widgets-image-viewer .contents {
-  /* since .centered has 4vw margin it has (100vw - 8vw) width */
+.interactive-widgets-image-viewer-legacy .contents {
+  /* since body has 4vw margin it has (100vw - 8vw) width */
   /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
   height: 43.578947368vw;
   background-color: #fdd;
@@ -268,31 +522,31 @@ html, body {
   box-sizing: border-box;
 }
 
-.interactive-widgets-image-viewer.open .contents {
+.interactive-widgets-image-viewer-legacy.open .contents {
   background-color: #eee;
 }
 
-.interactive-widgets-image-viewer .contents.with-error {
+.interactive-widgets-image-viewer-legacy .contents.with-error {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.interactive-widgets-image-viewer .contents.with-error .error {
+.interactive-widgets-image-viewer-legacy .contents.with-error .error {
   display: grid;
   grid-template-columns: 128px calc(92vw - 128px - 20vw - 4vw);
   grid-template-rows: 1.15fr 0.85fr;
   column-gap: 4vw;
 }
 
-.interactive-widgets-image-viewer .contents.with-error .error img {
+.interactive-widgets-image-viewer-legacy .contents.with-error .error img {
   width: 128px;
   height: 128px;
   grid-column: 1 / 2;
   grid-row: 1 / 3;
 }
 
-.interactive-widgets-image-viewer .contents.with-error .error .title {
+.interactive-widgets-image-viewer-legacy .contents.with-error .error .title {
   grid-column: 2 / 3;
   grid-row: 1 / 2;
   align-self: flex-end;
@@ -301,28 +555,28 @@ html, body {
   padding-bottom: 0.5rem;
 }
 
-.interactive-widgets-image-viewer .contents.with-error .error .title code {
+.interactive-widgets-image-viewer-legacy .contents.with-error .error .title code {
   font-family: 'JetBrains Mono';
 }
 
-.interactive-widgets-image-viewer .contents.with-error .error .description {
+.interactive-widgets-image-viewer-legacy .contents.with-error .error .description {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
   font-family: 'JetBrains Mono';
 }
 
-.interactive-widgets-image-viewer .contents.with-contents {
+.interactive-widgets-image-viewer-legacy .contents.with-contents {
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
 }
 
-.interactive-widgets-image-viewer .caption {
+.interactive-widgets-image-viewer-legacy .caption {
   margin-top: 0.25rem;
   text-align: center;
 }
 
-.interactive-widgets-image-viewer .caption code {
+.interactive-widgets-image-viewer-legacy .caption code {
   font-family: 'JetBrains Mono';
 }
 
@@ -355,16 +609,16 @@ html, body {
   overflow: hidden;
 }
 
-/* .interactive-widgets-text-editor {
+/* .interactive-widgets-text-editor-legacy {
   padding: 1rem 0 2rem 0;
 } */
 
-.interactive-widgets-text-editor .contents {
+.interactive-widgets-text-editor-legacy .contents {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   align-content: stretch;
-  /* since .centered has 4vw margin it has (100vw - 8vw) width */
+  /* since body has 4vw margin it has (100vw - 8vw) width */
   /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
   height: 43.578947368vw;
   background-color: #fdd;
@@ -372,11 +626,11 @@ html, body {
   box-sizing: border-box;
 }
 
-.interactive-widgets-text-editor.open .contents {
+.interactive-widgets-text-editor-legacy.open .contents {
   background-color: #eee;
 }
 
-.interactive-widgets-text-editor .contents .buttons {
+.interactive-widgets-text-editor-legacy .contents .buttons {
   align-self: flex-start;
   display: flex;
   flex-direction: row;
@@ -388,7 +642,7 @@ html, body {
   border-radius: 0.25rem;
 }
 
-.interactive-widgets-text-editor .contents .buttons button {
+.interactive-widgets-text-editor-legacy .contents .buttons button {
   display: block;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
@@ -405,52 +659,52 @@ html, body {
   transition: box-shadow 0.125s ease;
 }
 
-.interactive-widgets-text-editor .contents .buttons button:hover {
+.interactive-widgets-text-editor-legacy .contents .buttons button:hover {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.125), 0 3px 15px rgba(0, 0, 0, 0.125);
 }
 
-.interactive-widgets-text-editor .contents .buttons .spacer {
+.interactive-widgets-text-editor-legacy .contents .buttons .spacer {
   align-self: center;
   width: 1px;
   height: 1.5rem;
   background-color: rgba(0, 0, 0, 0.125);
 }
 
-.interactive-widgets-text-editor .contents.with-error .buttons .hide-on-error {
+.interactive-widgets-text-editor-legacy .contents.with-error .buttons .hide-on-error {
   display: none;
 }
 
-.interactive-widgets-text-editor .contents.with-error {
+.interactive-widgets-text-editor-legacy .contents.with-error {
   display: flex;
   align-items: center;
 }
 
-.interactive-widgets-text-editor .contents.with-contents .error-container {
+.interactive-widgets-text-editor-legacy .contents.with-contents .error-container {
   display: none;
 }
 
-.interactive-widgets-text-editor .contents.with-error .error-container {
+.interactive-widgets-text-editor-legacy .contents.with-error .error-container {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-grow: 1;
 }
 
-.interactive-widgets-text-editor .contents.with-error .error-container .error {
+.interactive-widgets-text-editor-legacy .contents.with-error .error-container .error {
   display: grid;
   grid-template-columns: 128px calc(92vw - 128px - 20vw - 4vw);
   grid-template-rows: 1.15fr 0.85fr;
   column-gap: 4vw;
 }
 
-.interactive-widgets-text-editor .contents.with-error .error-container .error img {
+.interactive-widgets-text-editor-legacy .contents.with-error .error-container .error img {
   width: 128px;
   height: 128px;
   grid-column: 1 / 2;
   grid-row: 1 / 3;
 }
 
-.interactive-widgets-text-editor .contents.with-error .error-container .error .title {
+.interactive-widgets-text-editor-legacy .contents.with-error .error-container .error .title {
   grid-column: 2 / 3;
   grid-row: 1 / 2;
   align-self: flex-end;
@@ -459,41 +713,41 @@ html, body {
   padding-bottom: 0.5rem;
 }
 
-.interactive-widgets-text-editor .contents.with-error .error-container .error .title code {
+.interactive-widgets-text-editor-legacy .contents.with-error .error-container .error .title code {
   font-family: 'JetBrains Mono';
 }
 
-.interactive-widgets-text-editor .contents.with-error .error-container .error .description {
+.interactive-widgets-text-editor-legacy .contents.with-error .error-container .error .description {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
   font-family: 'JetBrains Mono';
 }
 
-.interactive-widgets-text-editor .contents.with-contents {
+.interactive-widgets-text-editor-legacy .contents.with-contents {
   display: flex;
   align-items: stretch;
   align-content: stretch;
   overflow: hidden;
 }
 
-.interactive-widgets-text-editor .contents.with-error .editor {
+.interactive-widgets-text-editor-legacy .contents.with-error .editor {
   display: none;
 }
 
-.interactive-widgets-text-editor .contents.with-contents .editor {
+.interactive-widgets-text-editor-legacy .contents.with-contents .editor {
   display: block;
   flex-grow: 1;
   position: relative;
 }
 
-.interactive-widgets-text-editor .contents.with-contents .editor .codeArea {
+.interactive-widgets-text-editor-legacy .contents.with-contents .editor .codeArea {
   flex: 1 1 auto;
   margin-top: 0;
   height: 100%;
   position: relative;
 }
 
-.interactive-widgets-text-editor .contents.with-contents .editor .CodeMirror {
+.interactive-widgets-text-editor-legacy .contents.with-contents .editor .CodeMirror {
   position: absolute;
   top: 0;
   right: 0;
@@ -502,12 +756,12 @@ html, body {
   height: 100%;
 }
 
-.interactive-widgets-text-editor .caption {
+.interactive-widgets-text-editor-legacy .caption {
   margin-top: 0.25rem;
   text-align: center;
 }
 
-.interactive-widgets-text-editor .caption code {
+.interactive-widgets-text-editor-legacy .caption code {
   font-family: 'JetBrains Mono';
 }
 
@@ -516,7 +770,7 @@ html, body {
 } */
 
 .interactive-widgets-text-viewer .contents {
-  /* since .centered has 4vw margin it has (100vw - 8vw) width */
+  /* since body has 4vw margin it has (100vw - 8vw) width */
   /* to get height for 16:9 ratio: 92vw / 16 * 9 = 43.578947368vw */
   height: 43.578947368vw;
   background-color: #fdd;
@@ -591,21 +845,21 @@ html, body {
   font-family: 'JetBrains Mono';
 }
 
-.centered>.navigation {
+body>.navigation {
   margin: 1rem 0;
   padding: 0 1rem;
   box-shadow: inset 0.15rem 0 0 #ccc;
 }
 
-.centered>.navigation .topics {
+body>.navigation .topics {
   margin: 0 0 1rem 0;
 }
 
-.centered>.navigation :last-child {
+body>.navigation :last-child {
   margin: 0;
 }
 
-.centered>.navigation .topics .label {
+body>.navigation .topics .label {
   color: #aaa;
   font-size: 0.75rem;
   font-weight: 700;
@@ -613,7 +867,7 @@ html, body {
   padding: 0 0 0.25rem 0;
 }
 
-.centered>.navigation .topics>.link {
+body>.navigation .topics>.link {
   display: block;
   color: #000;
   margin: 0.25rem 0;
@@ -625,58 +879,78 @@ html, body {
   background-position: 0.25rem 0.3rem;
 }
 
-.centered>.navigation .topics>.link:hover {
+body>.navigation .topics>.link:hover {
   text-decoration: underline;
 }
 
-.centered>.navigation .topics .breadcrumbs {
+body>.navigation .topics .breadcrumbs {
   margin: 0.5rem 0 0.5rem 0;
   display: flex;
   flex-direction: row;
 }
 
-.centered>.navigation .topics .breadcrumbs .link, .centered>.navigation .topics .breadcrumbs .text {
+body>.navigation .topics .breadcrumbs .link, body>.navigation .topics .breadcrumbs .text {
   font-size: 0.75rem;
   text-decoration: none;
   color: #aaa;
 }
 
-.centered>.navigation .topics .breadcrumbs .link:hover {
+body>.navigation .topics .breadcrumbs .link:hover {
   text-decoration: underline;
   color: #000;
 }
 
-.centered>.navigation .topics .breadcrumbs .separator {
+body>.navigation .topics .breadcrumbs .separator {
   height: 0.75rem;
   opacity: 0.35;
   margin: 0 0.25rem;
 }
 
 @media (min-width: calc(720px + 8vw)) {
-  .centered {
+  body {
     width: 720px;
     margin: 0 auto;
   }
-  .centered.title {
-    font-size: 3rem;
-    padding: 2rem 0 0.5rem 0;
-  }
-  /* .centered .navigation {
+  /* body .navigation {
     position: fixed;
     right: 0;
   } */
+  .interactive-widgets-box.fixed {
+    /* to get height for 16:9 ratio: 720px / 16 * 9 = 381.176470588px */
+    height: 381.176470588px;
+  }
+  .interactive-widgets-box.min-content {
+    /* to get height for 16:9 ratio: 720px / 16 * 9 = 381.176470588px */
+    max-height: 381.176470588px;
+  }
+  .interactive-widgets-box svg {
+    margin-right: 0.35rem;
+  }
+  .interactive-widgets-box span {
+    margin-left: 0.35rem;
+  }
   .interactive-widgets-button {
+    column-gap: 1rem;
+    row-gap: 1rem;
+    padding: 1rem;
+  }
+  .interactive-widgets-text-editor {
+    column-gap: 1rem;
+    row-gap: 1rem;
+    padding: 1rem;
+  }
+  .interactive-widgets-button-legacy {
     column-gap: 1rem;
     row-gap: 1rem;
     padding: 1rem;
     /* to get height for 16:9 ratio: 720px / 16 * 9 = 381.176470588px */
     max-height: 381.176470588px;
   }
-  .interactive-widgets-image-viewer .contents {
+  .interactive-widgets-image-viewer-legacy .contents {
     /* to get height for 16:9 ratio: 720px / 16 * 9 = 381.176470588px */
     height: 381.176470588px;
   }
-  .interactive-widgets-image-viewer .contents.with-error .error {
+  .interactive-widgets-image-viewer-legacy .contents.with-error .error {
     grid-template-columns: 128px calc(720px - 128px - 128px - 2rem);
     column-gap: 2rem;
   }
@@ -688,14 +962,14 @@ html, body {
   .interactive-widgets-terminal .title {
     margin-bottom: 1rem;
   }
-  .interactive-widgets-text-editor .contents {
+  .interactive-widgets-text-editor-legacy .contents {
     /* to get height for 16:9 ratio: 720px / 16 * 9 = 381.176470588px */
     height: 381.176470588px;
   }
-  .interactive-widgets-text-editor .contents .buttons {
+  .interactive-widgets-text-editor-legacy .contents .buttons {
     margin: 1rem;
   }
-  .interactive-widgets-text-editor .contents.with-error .error-container .error {
+  .interactive-widgets-text-editor-legacy .contents.with-error .error-container .error {
     grid-template-columns: 128px calc(720px - 128px - 128px - 2rem);
     column-gap: 2rem;
   }
