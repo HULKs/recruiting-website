@@ -57,6 +57,7 @@ body {
 p {
   padding: 0.5rem 0 1rem 0;
   line-height: 1.7rem;
+  text-align: justify;
 }
 
 p>img:only-child {
