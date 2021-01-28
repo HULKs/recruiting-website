@@ -3,7 +3,7 @@ import os
 import pathlib
 
 
-log = mkdocs.plugins.log.getChild('recruiting-website')
+log = mkdocs.plugins.log.getChild('recruiting-website-navigation')
 
 
 class Plugin(mkdocs.plugins.BasePlugin):
