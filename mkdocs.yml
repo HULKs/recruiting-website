@@ -2,3 +2,4 @@ site_name: Recruiting Website
 theme: recruiting_website
 plugins:
 - interactive_widgets
+- recruiting_website_navigation
