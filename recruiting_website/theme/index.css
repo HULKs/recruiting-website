@@ -505,21 +505,21 @@ ol {
   color: #ee0000;
 }
 
-/* body>.navigation {
+.recruiting-website-navigation {
   margin: 1rem 0;
   padding: 0 1rem;
   box-shadow: inset 0.15rem 0 0 #ccc;
 }
 
-body>.navigation .topics {
+.recruiting-website-navigation .topics {
   margin: 0 0 1rem 0;
 }
 
-body>.navigation :last-child {
+.recruiting-website-navigation :last-child {
   margin: 0;
 }
 
-body>.navigation .topics .label {
+.recruiting-website-navigation .topics .label {
   color: #aaa;
   font-size: 0.75rem;
   font-weight: 700;
@@ -527,7 +527,7 @@ body>.navigation .topics .label {
   padding: 0 0 0.25rem 0;
 }
 
-body>.navigation .topics>.link {
+.recruiting-website-navigation .topics>.link {
   display: block;
   color: #000;
   margin: 0.25rem 0;
@@ -539,39 +539,39 @@ body>.navigation .topics>.link {
   background-position: 0.25rem 0.3rem;
 }
 
-body>.navigation .topics>.link:hover {
+.recruiting-website-navigation .topics>.link:hover {
   text-decoration: underline;
 }
 
-body>.navigation .topics .breadcrumbs {
+.recruiting-website-navigation .topics .breadcrumbs {
   margin: 0.5rem 0 0.5rem 0;
   display: flex;
   flex-direction: row;
 }
 
-body>.navigation .topics .breadcrumbs .link, body>.navigation .topics .breadcrumbs .text {
+.recruiting-website-navigation .topics .breadcrumbs .link, .recruiting-website-navigation .topics .breadcrumbs .text {
   font-size: 0.75rem;
   text-decoration: none;
   color: #aaa;
 }
 
-body>.navigation .topics .breadcrumbs .link:hover {
+.recruiting-website-navigation .topics .breadcrumbs .link:hover {
   text-decoration: underline;
   color: #000;
 }
 
-body>.navigation .topics .breadcrumbs .separator {
+.recruiting-website-navigation .topics .breadcrumbs .separator {
   height: 0.75rem;
   opacity: 0.35;
   margin: 0 0.25rem;
-} */
+}
 
 @media (min-width: calc(720px + 8vw)) {
   body {
     width: 720px;
     margin: 0 auto;
   }
-  /* body .navigation {
+  /* .recruiting-website-navigation {
     position: fixed;
     right: 0;
   } */
