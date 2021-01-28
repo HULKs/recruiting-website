@@ -1,7 +1,6 @@
 import mkdocs
-
-print(mkdocs.__dict__)
-
+import os
+import pathlib
 
 
 log = mkdocs.plugins.log.getChild('recruiting-website')
@@ -10,17 +9,30 @@ log = mkdocs.plugins.log.getChild('recruiting-website')
 class Plugin(mkdocs.plugins.BasePlugin):
 
     def on_nav(self, nav: mkdocs.structure.nav.Navigation, config: mkdocs.config.base.Config, files: mkdocs.structure.files.Files) -> mkdocs.structure.nav.Navigation:
-        for item in nav.items:
-            log.info(item)
-        for page in nav.pages:
-            log.info(page)
-        log.info('Files')
-        for file in files:
-            if file.is_documentation_page():
-                log.info(f'Documentation Page: {file.src_path} -> {file.url}')
-            else:
-                log.info(f'Other file: {file.src_path} -> {file.url}')
-        # log.info(nav)
-        # log.info(config)
-        # log.info(files)
-        return 'Hello World'
+        return files
+
+    def on_page_context(self, context: dict, page: mkdocs.structure.pages.Page, config: mkdocs.config.base.Config, nav: mkdocs.structure.files.Files) -> dict:
+        files = {
+            pathlib.PurePosixPath('/') / file.url: file
+            for file in nav if file.is_documentation_page()
+        }
+        page_url = pathlib.PurePosixPath('/') / page.url
+        parents = [
+            {
+                'url': os.path.relpath(parent_url, page_url),
+                'title': files[parent_url].page.title,
+            }
+            for parent_url in sorted(page_url.parents, key=lambda parent_url: len(str(parent_url)))
+        ]
+        children = [
+            {
+                'url': os.path.relpath(file_url, page_url),
+                'title': file.page.title,
+            }
+            for file_url, file in sorted(files.items(), key=lambda item: len(str(item[0])))
+            if file_url.parent != file_url and file_url.parent == page_url
+        ]
+        return context | {
+            'parents': parents,
+            'children': children,
+        }
