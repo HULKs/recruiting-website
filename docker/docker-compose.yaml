@@ -1,0 +1,5 @@
+version: "3"
+services:
+  recruiting-website-red-ball:
+    image: recruiting-website-red-ball
+    build: red-ball
