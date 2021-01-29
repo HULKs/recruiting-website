@@ -6,7 +6,7 @@ Pages are written in [Markdown](https://daringfireball.net/projects/markdown/) i
 
 Configuration settings for MkDocs are contained in `mkdocs.yml`, see the [MkDocs documentation about supported fields](https://www.mkdocs.org/user-guide/configuration/). The recruiting website uses a custom MkDocs theme (see the [MkDocs documentation about custom themes](https://www.mkdocs.org/user-guide/custom-themes/)) and some additional plugins to enable some features of the theme (e.g. navigation, page titles), see the [MkDocs documentation on how to write plugins](https://www.mkdocs.org/user-guide/plugins/).
 
-[interactive-widgets-mkdocs](https://github.com/h3ndrk/interactive-widgets-mkdocs/) is used to convert custom HTML tags within the Markdown pages into interactive widgets (it generates custom HTML with JavaScript), but it does not come with styling for the widgets (therefore this repository contains the theme).
+[interactive-widgets-mkdocs](https://github.com/h3ndrk/interactive-widgets-mkdocs/) is used to convert custom HTML tags within the Markdown pages into interactive widgets (it generates custom HTML with JavaScript), but it does not come with styling for the widgets (therefore this repository contains the theme). See [interactive-widget-mkdocs for usage documentation of the custom HTML tags of widgets](https://github.com/h3ndrk/interactive-widgets-mkdocs/).
 
 Since *interactive-widgets-mkdocs* does not build nor pull any Docker images, some images are built in this recruiting website repository, see the `docker/`-directory. In addition, the images of the [interactive-widgets-backend](https://github.com/h3ndrk/interactive-widgets-backend/) need to be built.
 
