@@ -14,6 +14,8 @@ Since *interactive-widgets-mkdocs* does not build nor pull any Docker images, so
 
 This section covers all necessary steps to build a complete and deployable website.
 
+Python 3.9 is required because [PEP 584](https://www.python.org/dev/peps/pep-0584) is used in the `navigation` plugin.
+
 - Optional: Setup virtual environment for Python
 - Install MkDocs and *interactive-widgets-mkdocs* plugin: `pip install git+https://github.com/h3ndrk/interactive-widgets-mkdocs.git`
 - Install recruiting website packages: `pip install ./` (or `pip install --editable ./` for development)
