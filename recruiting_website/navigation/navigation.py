@@ -32,7 +32,10 @@ class Plugin(mkdocs.plugins.BasePlugin):
             for file_url, file in sorted(files.items(), key=lambda item: len(str(item[0])))
             if file_url.parent != file_url and file_url.parent == page_url
         ]
-        return context | {
-            'parents': parents,
-            'children': children,
+        return {
+            **context,
+            **{
+                'parents': parents,
+                'children': children,
+            },
         }
