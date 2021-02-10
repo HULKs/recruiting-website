@@ -13,7 +13,7 @@
  - Github (important for linking below)
  
  <script>
-    window.intergramId = "402774621";
+    window.intergramId = "-568264126";
     window.intergramCustomizations = {
         titleClosed: 'Chat with HULKs',
         titleOpen: 'HULKs Bootcamp Group',
