@@ -1,25 +1,10 @@
 # Vision Task
-[<< back to Bootcamp](index.md)
 
 Naturally, a core element of robot soccer is ball detection. On this page we provide you with a sandbox to build a simple ball detection algorithm on your own! There is an exemplary image out of our simulated environment picturing the opponents goal, some field lines, as well as an orange ball. Please write a program in Python that detects the ball in x- and y-coordinates.
 
 Basic knowledge of [Python](https://wiki.python.org/moin/BeginnersGuide/Programmers) is required.
 
 We provide the following classes and functions to assist you in accomplishing this task:
-
- <script>
-    window.intergramId = "402774621";
-    window.intergramCustomizations = {
-        titleClosed: 'Chat with HULKs',
-        titleOpen: 'HULKs Bootcamp Group',
-        introMessage: 'Welcome to the HULKs Bootcamp Telegram Group Chat. Please be extra excellent and patient. If you have a specific question it is best to ask right away, instead of asking if you can ask a question. It might take a bit of time until someone is available to answer.',
-        autoResponse: 'If you are not getting a reply and cannot wait any longer, please leave your Telegram username here in chat, so we can reach you later.',
-        autoNoResponse: 'Noone has answered yet. Please remember to leave your Telegram username here in chat, before you leave.',
-        mainColor: "#2eac66",
-        alwaysUseFloatingButton: false // Use the mobile floating button also on large screens
-    };
- </script>
- <script id="intergram" type="text/javascript" src="https://www.intergram.xyz/js/widget.js"></script>
 
 ### Image
 

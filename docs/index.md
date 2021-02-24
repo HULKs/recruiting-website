@@ -9,26 +9,12 @@
  
 ## Get In Touch
 
- - Telegram (better than e-mail for first contact ?)
- - Github (important for linking below)
- 
- <script>
-    window.intergramId = "-568264126";
-    window.intergramCustomizations = {
-        titleClosed: 'Chat with HULKs',
-        titleOpen: 'HULKs Bootcamp Group',
-        introMessage: 'Welcome to the HULKs Bootcamp Telegram Group Chat. Please be extra excellent and patient. If you have a specific question it is best to ask right away, instead of asking if you can ask a question. It might take a bit of time until someone is available to answer.',
-        autoResponse: 'If you are not getting a reply and cannot wait any longer, please leave your Telegram username here in chat, so we can reach you later.',
-        autoNoResponse: 'Noone has answered yet. Please remember to leave your Telegram username here in chat, before you leave.',
-        mainColor: "#2eac66",
-        alwaysUseFloatingButton: false // Use the mobile floating button also on large screens
-    };
- </script>
- <script id="intergram" type="text/javascript" src="https://www.intergram.xyz/js/widget.js"></script>
+ - For communication we use [Telegram](https://telegram.org/)
+ - [HULKs Bootcamp Telegram Group invite-link](https://t.me/joinchat/yO0r_5wiZxY5ZWJi)
+ - You should also have a [Github](https://github.com/) account, so we can provide access to our code and wiki.
+ - Some of the links below will only be accessible once we have added your Github account to our team.
  
 ## Equip Your Toolbox
-
-Links to wiki (wont work without github-invite) and external ressources:
 
  - Linux
     - Manjaro
