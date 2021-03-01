@@ -9,26 +9,35 @@ configuration = {
     'space_width': 3,
     'space_height': 1,
     'hip_x': 0.5,
-    'hip_y': 0.4,
+    'hip_y': 0.45,
+    'thigh_angle': 315,
+    'thigh_angle_min': -90,
+    'thigh_angle_max': 45,
     'thigh_length': 0.2,
     'thigh_radius': 0.05,
-    'thigh_angle': 315,
+    'tibia_angle': 225,
+    'tibia_angle_min': -45,
+    'tibia_angle_max': 90,
     'tibia_length': 0.2,
     'tibia_radius': 0.05,
-    'tibia_angle': 225,
+    'foot_angle': 0,
+    'foot_angle_min': -135,
+    'foot_angle_max': 0,
     'foot_length': 0.15,
     'foot_radius': 0.025,
-    'foot_angle': 0,
     'ground_y': 0.05,
     'ground_radius': 0.05,
     'ball_radius': 0.1,
     'ball_x': 0.9,
     'ball_y': 0.4,
     'maximum_velocity': math.pi,
+    'target_x': 2.5,
+    'target_y': 0.25,
 }
 
 space = pymunk.Space()
 space.gravity = 0, -9.81
+space.damping = 0.9
 
 ground = pymunk.Segment(
     space.static_body,
@@ -43,10 +52,10 @@ ball_body.position = configuration['ball_x'], configuration['ball_y']
 ball_body.moment = 1
 ball = pymunk.Circle(ball_body, radius=configuration['ball_radius'])
 ball.mass = 1
-ball.elasticity = 0
+ball.elasticity = 0.8
 
 
-def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: float, length: float, radius: float) -> typing.Tuple[pymunk.Body, pymunk.Shape, pymunk.constraints.PivotJoint, pymunk.constraints.SimpleMotor]:
+def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: float, angle_min: float, angle_max: float, length: float, radius: float) -> typing.Tuple[pymunk.Body, pymunk.Shape, pymunk.constraints.PivotJoint, pymunk.constraints.SimpleMotor]:
     segment_body = pymunk.Body()
     segment_body.position = anchor_point.x, anchor_point.y
     segment_body.moment = 1
@@ -61,13 +70,21 @@ def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: 
     segment.elasticity = 0.5
     segment.filter = pymunk.ShapeFilter(group=1)
 
-    joint = pymunk.constraints.PivotJoint(
+    pivot_joint = pymunk.constraints.PivotJoint(
         anchor_body,
         segment_body,
         anchor_body.world_to_local(anchor_point),
         (0, 0),
     )
-    joint.collide_bodies = False
+    pivot_joint.collide_bodies = False
+
+    limit_joint = pymunk.constraints.RotaryLimitJoint(
+        anchor_body,
+        segment_body,
+        math.radians(angle_min),
+        math.radians(angle_max),
+    )
+    limit_joint.collide_bodies = False
 
     motor = pymunk.constraints.SimpleMotor(
         anchor_body,
@@ -76,29 +93,35 @@ def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: 
     )
     motor.max_force = 10
 
-    return segment_body, segment, joint, motor
+    return segment_body, segment, pivot_joint, limit_joint, motor
 
 
-thigh_body, thigh, hip_joint, hip_motor = attach_segment(
+thigh_body, thigh, hip_joint, hip_limit_joint, hip_motor = attach_segment(
     space.static_body,
     pymunk.Vec2d(configuration['hip_x'], configuration['hip_y']),
     configuration['thigh_angle'],
+    configuration['thigh_angle_min'],
+    configuration['thigh_angle_max'],
     configuration['thigh_length'],
     configuration['thigh_radius'],
 )
 
-tibia_body, tibia, knee_joint, knee_motor = attach_segment(
+tibia_body, tibia, knee_joint, knee_limit_joint, knee_motor = attach_segment(
     thigh_body,
     thigh_body.local_to_world(thigh.b),
     configuration['tibia_angle'],
+    configuration['tibia_angle_min'],
+    configuration['tibia_angle_max'],
     configuration['tibia_length'],
     configuration['tibia_radius'],
 )
 
-foot_body, foot, ankle_joint, ankle_motor = attach_segment(
+foot_body, foot, ankle_joint, ankle_limit_joint, ankle_motor = attach_segment(
     tibia_body,
     tibia_body.local_to_world(tibia.b),
     configuration['foot_angle'],
+    configuration['foot_angle_min'],
+    configuration['foot_angle_max'],
     configuration['foot_length'],
     configuration['foot_radius'],
 )
@@ -110,14 +133,17 @@ space.add(
     thigh_body,
     thigh,
     hip_joint,
+    hip_limit_joint,
     hip_motor,
     tibia_body,
     tibia,
     knee_joint,
+    knee_limit_joint,
     knee_motor,
     foot_body,
     foot,
     ankle_joint,
+    ankle_limit_joint,
     ankle_motor,
 )
 
@@ -148,11 +174,11 @@ def draw_line(draw, body: pymunk.Body, segment: pymunk.Segment, color: str):
 
 # angles in radians
 keyframes = [
-    {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 5},
-    {'hip_angle': math.pi / 2, 'knee_angle': math.pi / 2, 'ankle_angle': math.pi / 2, 'duration': 5},
-    {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 5},
-    {'hip_angle': -math.pi / 2, 'knee_angle': -math.pi / 2, 'ankle_angle': -math.pi / 2, 'duration': 5},
-    {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 5},
+    {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 0.1},
+    {'hip_angle': math.pi / 2, 'knee_angle': math.pi / 2, 'ankle_angle': math.pi / 2, 'duration': 0.1},
+    {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 1},
+    {'hip_angle': -math.pi / 2, 'knee_angle': -math.pi / 2, 'ankle_angle': -math.pi / 2, 'duration': 1},
+    {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 1},
 ]
 
 
@@ -174,8 +200,10 @@ def get_current_angles(thigh_body: pymunk.Body, thigh: pymunk.Segment, tibia_bod
 def clamp(v, low, high):
     return max(low, min(high, v))
 
+target_position = pymunk.vec2d.Vec2d(configuration['target_x'], configuration['target_y'])
 
 frames = []
+score = float('inf')
 for keyframe in keyframes:
     hip_angle, knee_angle, ankle_angle = get_current_angles(thigh_body, thigh, tibia_body, tibia, foot_body, foot)
     hip_angle_difference = keyframe['hip_angle'] - hip_angle
@@ -189,14 +217,17 @@ for keyframe in keyframes:
     hip_motor.rate = -hip_angle_velocity
     knee_motor.rate = -knee_angle_velocity
     ankle_motor.rate = -ankle_angle_velocity
-    for _ in range(keyframe['duration'] * 10):
+    for _ in range(int(keyframe['duration'] * 10)):
         for _ in range(100):
             space.step(0.01 * 0.1)
+        score = min(score, abs(target_position - ball_body.position))
         # space.debug_draw(print_options)
         frame = Image.new('RGB', (configuration['space_width'] * configuration['pixel_scale'],
                                 configuration['space_height'] * configuration['pixel_scale']), '#fff')
         draw = ImageDraw.Draw(frame)
+        draw_circle(draw, target_position, target_position, '#AAA', configuration['ball_radius'] * configuration['pixel_scale'])
         draw.text((70, 10), f'{len(frames)}', fill='#000')
+        draw.text((450, 10), f'Score: {score:.5f}', fill='#000')
         draw_line(draw, space.static_body, ground, '#000')
         draw_line(draw, foot_body, foot, '#00f')
         draw_line(draw, tibia_body, tibia, '#f0f')
