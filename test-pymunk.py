@@ -22,8 +22,9 @@ configuration = {
     'ground_y': 0.05,
     'ground_radius': 0.05,
     'ball_radius': 0.1,
-    'ball_x': 0.7,
-    'ball_y': 0.2,
+    'ball_x': 0.9,
+    'ball_y': 0.4,
+    'maximum_velocity': math.pi,
 }
 
 space = pymunk.Space()
@@ -35,7 +36,7 @@ ground = pymunk.Segment(
     (configuration['space_width'], configuration['ground_y']),
     radius=configuration['ground_radius'],
 )
-ground.elasticity = 0.1  # enable ball bounce
+ground.elasticity = 1.0  # enable ball bounce
 
 ball_body = pymunk.Body()
 ball_body.position = configuration['ball_x'], configuration['ball_y']
@@ -73,6 +74,7 @@ def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: 
         segment_body,
         math.pi * 0.25,
     )
+    motor.max_force = 10
 
     return segment_body, segment, joint, motor
 
@@ -103,8 +105,8 @@ foot_body, foot, ankle_joint, ankle_motor = attach_segment(
 
 space.add(
     ground,
-    # ball_body,
-    # ball,
+    ball_body,
+    ball,
     thigh_body,
     thigh,
     hip_joint,
@@ -121,20 +123,27 @@ space.add(
 
 print_options = pymunk.SpaceDebugDrawOptions()
 
+def draw_transform(p):
+    return  pymunk.vec2d.Vec2d(
+        int(p[0] * configuration['pixel_scale']),
+        (configuration['space_height'] * configuration['pixel_scale']) -
+        int(p[1] * configuration['pixel_scale']),
+    )
+
+def draw_circle(draw, a, b, color: str, radius=0):
+    draw.ellipse([
+        draw_transform(a) - pymunk.vec2d.Vec2d(radius, radius),
+        draw_transform(b) + pymunk.vec2d.Vec2d(radius, radius)
+    ], fill=color)
 
 def draw_line(draw, body: pymunk.Body, segment: pymunk.Segment, color: str):
-    draw.line([
-        int(body.local_to_world(segment.a).x *
-            configuration['pixel_scale']),
-        (configuration['space_height'] * configuration['pixel_scale']) -
-        int(body.local_to_world(segment.a).y *
-            configuration['pixel_scale']),
-        int(body.local_to_world(segment.b).x *
-            configuration['pixel_scale']),
-        (configuration['space_height'] * configuration['pixel_scale']) -
-        int(body.local_to_world(segment.b).y *
-            configuration['pixel_scale']),
-    ], fill=color, width=int(2 * segment.radius * configuration['pixel_scale']))
+    a = body.local_to_world(segment.a)
+    b = body.local_to_world(segment.b)
+    radius = segment.radius
+    draw.line((draw_transform(a), draw_transform(b)), fill=color, width=int(radius * 2 * configuration['pixel_scale']))
+
+    draw_circle(draw, a, a, color, radius * configuration['pixel_scale'])
+    draw_circle(draw, b, b, color, radius * configuration['pixel_scale'])
 
 
 # angles in radians
@@ -162,6 +171,9 @@ def get_current_angles(thigh_body: pymunk.Body, thigh: pymunk.Segment, tibia_bod
         normalize_angle((foot_vector.angle - tibia_vector.angle - (math.pi / 2)) % (2 * math.pi)),
     )
 
+def clamp(v, low, high):
+    return max(low, min(high, v))
+
 
 frames = []
 for keyframe in keyframes:
@@ -169,9 +181,9 @@ for keyframe in keyframes:
     hip_angle_difference = keyframe['hip_angle'] - hip_angle
     knee_angle_difference = keyframe['knee_angle'] - knee_angle
     ankle_angle_difference = keyframe['ankle_angle'] - ankle_angle
-    hip_angle_velocity = hip_angle_difference / keyframe['duration']
-    knee_angle_velocity = knee_angle_difference / keyframe['duration']
-    ankle_angle_velocity = ankle_angle_difference / keyframe['duration']
+    hip_angle_velocity = clamp(hip_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
+    knee_angle_velocity = clamp(knee_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
+    ankle_angle_velocity = clamp(ankle_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
     # TODO: clamp velocity @PasGl
     # TODO: limit angles @PasGl
     hip_motor.rate = -hip_angle_velocity
@@ -186,9 +198,10 @@ for keyframe in keyframes:
         draw = ImageDraw.Draw(frame)
         draw.text((70, 10), f'{len(frames)}', fill='#000')
         draw_line(draw, space.static_body, ground, '#000')
-        draw_line(draw, thigh_body, thigh, '#f00')
-        draw_line(draw, tibia_body, tibia, '#f0f')
         draw_line(draw, foot_body, foot, '#00f')
+        draw_line(draw, tibia_body, tibia, '#f0f')
+        draw_line(draw, thigh_body, thigh, '#f00')
+        draw_circle(draw, (ball.bb.left, ball.bb.top), (ball.bb.right, ball.bb.bottom), '#000')
         frames.append(frame)
 
 frames[0].save('joint.webp', save_all=True,
