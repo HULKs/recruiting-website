@@ -12,19 +12,27 @@ Since *interactive-widgets-mkdocs* does not build nor pull any Docker images, so
 
 ## Building
 
-This section covers all necessary steps to build a complete and deployable website.
+This section covers all necessary steps to build a complete and deployable website. Tested with Python 3.8.
 
-The following has been tested with Python 3.8.
+The following steps are required for initial setup:
 
-- Optional: Setup virtual environment for Python
-- Install MkDocs and *interactive-widgets-mkdocs* plugin: `pip install git+https://github.com/h3ndrk/interactive-widgets-mkdocs.git`
-- Install recruiting website packages: `pip install ./` (or `pip install --editable ./` for development)
-- Build website with MkDocs: `mkdocs build`
-- Ensure that the Docker images *interactive-widgets-backend* and *interactive-widgets-monitor* are present. If not, build them according to the [interactive-widgets-backend documentation](https://github.com/h3ndrk/interactive-widgets-backend/).
-- Ensure that all Docker images referenced in the Markdown pages (e.g. in the `image` attributes of the HTML tags of the widgets) are present. If not, build them via running `docker-compose build` inside the `docker/`-directory.
-- Optional: Adjust the configuration in the generated files in the `site/`-directory.
-- In the `site/`-directory, start the website via `docker-compose up --build` (`--build` is optional but ensures that the static files are correctly built into a Docker container *interactive-widgets-nginx*).
-- Connect to `http://localhost` to see the started page. (You may need to clear your cache.)
+1. Optional: Setup virtual environment for Python
+2. Install MkDocs and *interactive-widgets-mkdocs* plugin: `pip install git+https://github.com/h3ndrk/interactive-widgets-mkdocs.git`
+3. Install recruiting website packages: `pip install ./` (or `pip install --editable ./` for development)
+4. Build all required Docker images (`interactive-widgets-backend`, `interactive-widgets-monitor`, and your own) by running `COMPOSE_DOCKER_CLI_BUILD=0 docker-compose build` inside the `docker/`-directory (`COMPOSE_DOCKER_CLI_BUILD=0` is a workaround for https://github.com/docker/compose/issues/8046).
+5. Build website with MkDocs: `mkdocs build`
+6. Optional: Adjust the configuration in the generated files in the `site/`-directory.
+7. In the `site/`-directory, start the website via `docker-compose up --build` (`--build` is optional but ensures that the static files are correctly built into a Docker container *interactive-widgets-nginx*).
+8. Connect to `http://localhost` to see the started page. (You may need to clear your cache. Quit with Ctrl+C.)
+
+Once the recruiting website was successfully built once, use one of the following steps to rebuild:
+
+- If a **new Docker image** is referenced in an HTML tag (via the `image`-attribute, see [interactive-widgets-mkdocs documentation](https://github.com/h3ndrk/interactive-widgets-mkdocs/)): rerun from step 4 (see above)
+- If **files within the `docker/`-directory changed**: rerun from step 4 (see above)
+- If **files in the `docs/`-directory changed**: quit any previously started page, then rerun from step 5 (see above)
+- If **files in the `recruiting_website/`-directory changed** and executed step 3 without `--editable`: rerun from step 3 (step 4 can be skipped); when previously executed with `--editable`, changes in the `recruiting_website/`-directory are automatically applied (recommended for development).
+
+Currently, the recruiting-website will not raise any error when Docker images are missing. If widgets are not behaving correctly, check that all referenced Docker images are built (see step 4 above).
 
 ## License
 
