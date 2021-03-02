@@ -1,5 +1,15 @@
 version: "3"
 services:
+  interactive-widgets-backend:
+    image: interactive-widgets-backend
+    build:
+      context: 'https://github.com/h3ndrk/interactive-widgets-backend.git#main'
+      dockerfile: Dockerfile.backend
+  interactive-widgets-monitor:
+    image: interactive-widgets-monitor
+    build:
+      context: 'https://github.com/h3ndrk/interactive-widgets-backend.git#main'
+      dockerfile: Dockerfile.monitor
   recruiting-website-red-ball:
     image: recruiting-website-red-ball
     build: red-ball
