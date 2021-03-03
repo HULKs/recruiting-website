@@ -6,4 +6,4 @@
 
 <x-button image="recruiting-website-motion" command="python generate_animation.py" label="Run program" working-directory="/data" />
 
-<x-image-viewer file="/data/animation.gif" mime="image/gif" />
+<x-image-viewer file="/data/animation.webp" mime="image/gif" />
