@@ -199,27 +199,25 @@ space.add(
 
 print_options = pymunk.SpaceDebugDrawOptions()
 
-def draw_transform(p):
+def draw_transform(point):
     return  pymunk.Vec2d(
-        int(p[0] * configuration['pixel_scale']),
-        (configuration['space_height'] * configuration['pixel_scale']) -
-        int(p[1] * configuration['pixel_scale']),
+        int(point[0] * configuration['pixel_scale']),
+        (configuration['space_height'] * configuration['pixel_scale']) - int(point[1] * configuration['pixel_scale']),
     )
 
-def draw_circle(draw, a, b, color: str, radius=0):
+def draw_circle(draw: ImageDraw, a: pymunk.Vec2d, b: pymunk.Vec2d, radius: float, color: str):
     draw.ellipse([
         draw_transform(a) - pymunk.Vec2d(radius, radius),
         draw_transform(b) + pymunk.Vec2d(radius, radius)
     ], fill=color)
 
-def draw_line(draw, body: pymunk.Body, segment: pymunk.Segment, color: str):
+def draw_line(draw: ImageDraw, body: pymunk.Body, segment: pymunk.Segment, color: str):
     a = body.local_to_world(segment.a)
     b = body.local_to_world(segment.b)
     radius = segment.radius
     draw.line((draw_transform(a), draw_transform(b)), fill=color, width=int(radius * 2 * configuration['pixel_scale']))
-
-    draw_circle(draw, a, a, color, radius * configuration['pixel_scale'])
-    draw_circle(draw, b, b, color, radius * configuration['pixel_scale'])
+    draw_circle(draw, a, a, radius * configuration['pixel_scale'], color)
+    draw_circle(draw, b, b, radius * configuration['pixel_scale'], color)
 
 
 # angles in radians
@@ -305,7 +303,7 @@ for keyframe in keyframes:
         frame = Image.new('RGB', (configuration['space_width'] * configuration['pixel_scale'],
                                 configuration['space_height'] * configuration['pixel_scale']), '#fff')
         draw = ImageDraw.Draw(frame)
-        draw_circle(draw, configuration['target_position'], configuration['target_position'], '#AAA', configuration['ball_radius'] * configuration['pixel_scale'])
+        draw_circle(draw, configuration['target_position'], configuration['target_position'], configuration['ball_radius'] * configuration['pixel_scale'], '#AAA')
         draw.text((70, 10), f'{len(frames)}', fill='#000')
         draw.text((450, 10), f'Score: {score:.5f}', fill='#000')
         draw_line(draw, space.static_body, ground, '#000')
