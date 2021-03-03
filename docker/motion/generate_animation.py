@@ -199,11 +199,14 @@ space.add(
 
 print_options = pymunk.SpaceDebugDrawOptions()
 
+
 def draw_transform(point):
-    return  pymunk.Vec2d(
+    return pymunk.Vec2d(
         int(point[0] * configuration['pixel_scale']),
-        (configuration['space_height'] * configuration['pixel_scale']) - int(point[1] * configuration['pixel_scale']),
+        (configuration['space_height'] * configuration['pixel_scale']
+         ) - int(point[1] * configuration['pixel_scale']),
     )
+
 
 def draw_circle(draw: ImageDraw, a: pymunk.Vec2d, b: pymunk.Vec2d, radius: float, color: str):
     draw.ellipse([
@@ -211,11 +214,13 @@ def draw_circle(draw: ImageDraw, a: pymunk.Vec2d, b: pymunk.Vec2d, radius: float
         draw_transform(b) + pymunk.Vec2d(radius, radius)
     ], fill=color)
 
+
 def draw_line(draw: ImageDraw, body: pymunk.Body, segment: pymunk.Segment, color: str):
     a = body.local_to_world(segment.a)
     b = body.local_to_world(segment.b)
     radius = segment.radius
-    draw.line((draw_transform(a), draw_transform(b)), fill=color, width=int(radius * 2 * configuration['pixel_scale']))
+    draw.line((draw_transform(a), draw_transform(b)), fill=color,
+              width=int(radius * 2 * configuration['pixel_scale']))
     draw_circle(draw, a, a, radius * configuration['pixel_scale'], color)
     draw_circle(draw, b, b, radius * configuration['pixel_scale'], color)
 
@@ -223,9 +228,11 @@ def draw_line(draw: ImageDraw, body: pymunk.Body, segment: pymunk.Segment, color
 # angles in radians
 keyframes = [
     {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 0.1},
-    {'hip_angle': math.pi / 2, 'knee_angle': math.pi / 2, 'ankle_angle': math.pi / 2, 'duration': 0.1},
+    {'hip_angle': math.pi / 2, 'knee_angle': math.pi /
+        2, 'ankle_angle': math.pi / 2, 'duration': 0.1},
     {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 1},
-    {'hip_angle': -math.pi / 2, 'knee_angle': -math.pi / 2, 'ankle_angle': -math.pi / 2, 'duration': 1},
+    {'hip_angle': -math.pi / 2, 'knee_angle': -math.pi /
+        2, 'ankle_angle': -math.pi / 2, 'duration': 1},
     {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 1},
 ]
 
@@ -236,14 +243,19 @@ def normalize_angle(input_angle: float) -> float:
 
 
 def get_current_angles(thigh_body: pymunk.Body, thigh: pymunk.Segment, tibia_body: pymunk.Body, tibia: pymunk.Segment, foot_body: pymunk.Body, foot: pymunk.Segment):
-    thigh_vector = thigh_body.local_to_world(thigh.b) - thigh_body.local_to_world(thigh.a)
-    tibia_vector = tibia_body.local_to_world(tibia.b) - tibia_body.local_to_world(tibia.a)
-    foot_vector = foot_body.local_to_world(foot.b) - foot_body.local_to_world(foot.a)
+    thigh_vector = thigh_body.local_to_world(
+        thigh.b) - thigh_body.local_to_world(thigh.a)
+    tibia_vector = tibia_body.local_to_world(
+        tibia.b) - tibia_body.local_to_world(tibia.a)
+    foot_vector = foot_body.local_to_world(
+        foot.b) - foot_body.local_to_world(foot.a)
     return (
         normalize_angle(thigh_vector.angle),
         normalize_angle(tibia_vector.angle - thigh_vector.angle),
-        normalize_angle((foot_vector.angle - tibia_vector.angle - (math.pi / 2)) % (2 * math.pi)),
+        normalize_angle(
+            (foot_vector.angle - tibia_vector.angle - (math.pi / 2)) % (2 * math.pi)),
     )
+
 
 def clamp(v, low, high):
     return max(low, min(high, v))
@@ -257,53 +269,67 @@ def draw_sprite_with_two_points(frame: Image, joint_a: pymunk.Vec2d, joint_b: py
         (joint_b_pixel - joint_a_pixel).angle_degrees
     rotated_sprite = sprite.rotate(angle_degrees, expand=True)
     sprite_center = pymunk.Vec2d(sprite.size[0], sprite.size[1]) / 2
-    rotated_sprite_center = pymunk.Vec2d(rotated_sprite.size[0], rotated_sprite.size[1]) / 2
+    rotated_sprite_center = pymunk.Vec2d(
+        rotated_sprite.size[0], rotated_sprite.size[1]) / 2
     sprite_center_to_sprite_joint_a_pixel = sprite_joint_a_pixel - sprite_center
     rotated_sprite_center_to_rotated_sprite_joint_a_pixel = sprite_center_to_sprite_joint_a_pixel.rotated_degrees(
         -angle_degrees)  # invert angle because of flipped y-axis
     rotated_sprite_joint_a_pixel = rotated_sprite_center + \
         rotated_sprite_center_to_rotated_sprite_joint_a_pixel
     # scale
-    scale = (joint_b_pixel - joint_a_pixel).length / (sprite_joint_b_pixel - sprite_joint_a_pixel).length
-    scaled_sprite = rotated_sprite.resize((pymunk.Vec2d(rotated_sprite.size[0], rotated_sprite.size[1]) * scale).int_tuple)
+    scale = (joint_b_pixel - joint_a_pixel).length / \
+        (sprite_joint_b_pixel - sprite_joint_a_pixel).length
+    scaled_sprite = rotated_sprite.resize(
+        (pymunk.Vec2d(rotated_sprite.size[0], rotated_sprite.size[1]) * scale).int_tuple)
     scaled_sprite_joint_a_pixel = rotated_sprite_joint_a_pixel * scale
     # translate via paste
-    frame.paste(scaled_sprite, (joint_a_pixel - scaled_sprite_joint_a_pixel).int_tuple, mask=scaled_sprite)
+    frame.paste(scaled_sprite, (joint_a_pixel -
+                                scaled_sprite_joint_a_pixel).int_tuple, mask=scaled_sprite)
+
 
 def draw_sprite_with_bounding_box(frame: Image, circle_body: pymunk.Body, circle: pymunk.Circle, sprite: Image):
     upper_left = pymunk.Vec2d(circle.bb.left, circle.bb.top)
-    bounding_box_size = pymunk.Vec2d(circle.bb.right - circle.bb.left, circle.bb.bottom - circle.bb.top)
+    bounding_box_size = pymunk.Vec2d(
+        circle.bb.right - circle.bb.left, circle.bb.bottom - circle.bb.top)
     center = upper_left + (bounding_box_size / 2)
     radius = circle.bb.right - center.x
     angle_degrees = math.degrees(circle_body.angle)
     center_pixel = draw_transform(center)
     radius_pixel = radius * configuration['pixel_scale']
-    resized_sprite = sprite.resize((int(radius_pixel * 2), int(radius_pixel * 2)))
+    resized_sprite = sprite.resize(
+        (int(radius_pixel * 2), int(radius_pixel * 2)))
     rotated_sprite = resized_sprite.rotate(angle_degrees)
-    frame.paste(rotated_sprite, (center_pixel - (radius_pixel, radius_pixel)).int_tuple, mask=rotated_sprite)
+    frame.paste(rotated_sprite, (center_pixel - (radius_pixel,
+                                                 radius_pixel)).int_tuple, mask=rotated_sprite)
 
 
 frames = []
 score = float('inf')
 for keyframe in keyframes:
-    hip_angle, knee_angle, ankle_angle = get_current_angles(thigh_body, thigh, tibia_body, tibia, foot_body, foot)
+    hip_angle, knee_angle, ankle_angle = get_current_angles(
+        thigh_body, thigh, tibia_body, tibia, foot_body, foot)
     hip_angle_difference = keyframe['hip_angle'] - hip_angle
     knee_angle_difference = keyframe['knee_angle'] - knee_angle
     ankle_angle_difference = keyframe['ankle_angle'] - ankle_angle
-    hip_angle_velocity = clamp(hip_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
-    knee_angle_velocity = clamp(knee_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
-    ankle_angle_velocity = clamp(ankle_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
+    hip_angle_velocity = clamp(
+        hip_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
+    knee_angle_velocity = clamp(
+        knee_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
+    ankle_angle_velocity = clamp(
+        ankle_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
     hip_motor.rate = -hip_angle_velocity
     knee_motor.rate = -knee_angle_velocity
     ankle_motor.rate = -ankle_angle_velocity
     for _ in range(int(keyframe['duration'] * 10)):
         for _ in range(100):
             space.step(0.01 * 0.1)
-        score = min(score, abs(configuration['target_position'] - ball_body.position))
+        score = min(score, abs(
+            configuration['target_position'] - ball_body.position))
         frame = Image.new('RGB', (configuration['space_width'] * configuration['pixel_scale'],
-                                configuration['space_height'] * configuration['pixel_scale']), '#fff')
+                                  configuration['space_height'] * configuration['pixel_scale']), '#fff')
         draw = ImageDraw.Draw(frame)
-        draw_circle(draw, configuration['target_position'], configuration['target_position'], configuration['ball_radius'] * configuration['pixel_scale'], '#AAA')
+        draw_circle(draw, configuration['target_position'], configuration['target_position'],
+                    configuration['ball_radius'] * configuration['pixel_scale'], '#AAA')
         draw.text((70, 10), f'{len(frames)}', fill='#000')
         draw.text((450, 10), f'Score: {score:.5f}', fill='#000')
         draw_line(draw, space.static_body, ground, '#000')
@@ -334,7 +360,8 @@ for keyframe in keyframes:
         draw_sprite_with_two_points(
             frame,
             thigh_body.local_to_world(thigh.a),
-            thigh_body.local_to_world(thigh.a) + pymunk.Vec2d(0, configuration['body_length']),
+            thigh_body.local_to_world(
+                thigh.a) + pymunk.Vec2d(0, configuration['body_length']),
             body_sprite,
             configuration['body_joint_pixel'],
             configuration['body_top_pixel'],
