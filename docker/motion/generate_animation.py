@@ -302,7 +302,6 @@ for keyframe in keyframes:
         for _ in range(100):
             space.step(0.01 * 0.1)
         score = min(score, abs(configuration['target_position'] - ball_body.position))
-        # space.debug_draw(print_options)
         frame = Image.new('RGB', (configuration['space_width'] * configuration['pixel_scale'],
                                 configuration['space_height'] * configuration['pixel_scale']), '#fff')
         draw = ImageDraw.Draw(frame)
@@ -310,11 +309,6 @@ for keyframe in keyframes:
         draw.text((70, 10), f'{len(frames)}', fill='#000')
         draw.text((450, 10), f'Score: {score:.5f}', fill='#000')
         draw_line(draw, space.static_body, ground, '#000')
-        # draw_line(draw, foot_body, foot, '#00f')
-        # draw_line(draw, foot_body, heel_segment, '#00f')
-        # draw_line(draw, foot_body, sole_segment, '#00f')
-        # draw_line(draw, tibia_body, tibia, '#f0f')
-        # draw_line(draw, thigh_body, thigh, '#f00')
         draw_sprite_with_two_points(
             frame,
             thigh_body.local_to_world(thigh.a),
@@ -347,7 +341,6 @@ for keyframe in keyframes:
             configuration['body_joint_pixel'],
             configuration['body_top_pixel'],
         )
-        # draw_circle(draw, (ball.bb.left, ball.bb.top), (ball.bb.right, ball.bb.bottom), '#000')
         draw_sprite_with_bounding_box(frame, ball_body, ball, ball_sprite)
         frames.append(frame)
 
