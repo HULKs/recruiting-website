@@ -12,6 +12,7 @@ body_joint_position = pymunk.Vec2d(0.5, 0.55)
 body_joint_pixel = pymunk.Vec2d(212, 876)
 body_top_pixel = pymunk.Vec2d(212, 24)
 body_length = 0.5
+body_shadow_radius = pymunk.Vec2d(-0.35, 0.025)
 thigh_sprite_path = 'thigh.png'
 thigh_joint_a_pixel = pymunk.Vec2d(191, 69)
 thigh_joint_b_pixel = pymunk.Vec2d(183, 509)
@@ -38,11 +39,13 @@ foot_length = 0.15
 foot_radius = 0.025
 foot_heel_angle = 219
 foot_heel_length = 0.1
+ground_sprite_path = 'ground.png'
 ground_y = 0.05
 ground_radius = 0.05
 ball_sprite_path = 'ball.png'
 ball_radius = 0.1
-ball_position = pymunk.Vec2d(0.9, 0.4)
+ball_position = pymunk.Vec2d(1.0, 1.0)
+ball_shadow_radius = pymunk.Vec2d(-0.1, 0.0175)
 maximum_velocity = math.pi
 target_position = pymunk.Vec2d(2.5, 0.75)
 elasticity = 0.97
@@ -55,6 +58,12 @@ thigh_sprite = Image.open(thigh_sprite_path)
 tibia_sprite = Image.open(tibia_sprite_path)
 foot_sprite = Image.open(foot_sprite_path)
 ball_sprite = Image.open(ball_sprite_path)
+
+ground_sprite = Image.open(ground_sprite_path)
+ground_sprite_height = int(space_width * pixel_scale / ground_sprite.size[0] * ground_sprite.size[1])
+ground_sprite = ground_sprite.resize(
+    (space_width * pixel_scale, ground_sprite_height))
+
 
 space = pymunk.Space()
 space.gravity = 0, -9.81
@@ -304,7 +313,21 @@ def draw_sprite_with_bounding_box(frame: Image, circle_body: pymunk.Body, circle
 def append_frame(score: float):
     frame = Image.new('RGB', (int(space_width * pixel_scale),
                               int(space_height * pixel_scale)), '#eee')
+    frame.paste(ground_sprite, (0, int((space_height * pixel_scale) - ground_sprite_height)), mask=ground_sprite)
     draw = ImageDraw.Draw(frame)
+    draw.ellipse([
+        draw_transform(pymunk.Vec2d(body_joint_position.x, ground_y + ground_radius) + body_shadow_radius),
+        draw_transform(pymunk.Vec2d(body_joint_position.x, ground_y + ground_radius) - body_shadow_radius),
+    ], fill='#000')
+    ball_x = ball.bb.left + ((ball.bb.right - ball.bb.left) / 2)
+    ball_y = ball.bb.bottom + ((ball.bb.top - ball.bb.bottom) / 2)
+    ball_distance_from_ground = ball_y - ball_radius - ground_y - ground_radius
+    print(ball_distance_from_ground)
+    ball_shadow_scale = max(0, 1 - ball_distance_from_ground)
+    draw.ellipse([
+        draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) + (ball_shadow_radius * ball_shadow_scale)),
+        draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) - (ball_shadow_radius * ball_shadow_scale)),
+    ], fill='#000')
     draw_circle(draw, target_position, target_position,
                 ball_radius * pixel_scale, '#AAA')
     draw.multiline_text((10, 10), f'Time: {len(frames) / 10:.1f} s\nSmallest Distance: {"N/A" if math.isinf(score) else int(score * 100)} cm', font=font, fill='#000')
@@ -334,9 +357,8 @@ def append_frame(score: float):
     )
     draw_sprite_with_two_points(
         frame,
-        thigh_body.local_to_world(thigh.a),
-        thigh_body.local_to_world(
-            thigh.a) + pymunk.Vec2d(0, body_length),
+        body_joint_position,
+        body_joint_position + pymunk.Vec2d(0, body_length),
         body_sprite,
         body_joint_pixel,
         body_top_pixel,
