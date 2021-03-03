@@ -2,13 +2,13 @@ import math
 import typing
 import pymunk
 import pymunk.constraints
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 pixel_scale = 200
 space_width = 3
 space_height = 1.6875  # 16:9 aspect ratio
 body_sprite_path = 'body.png'
-body_joint_position = pymunk.Vec2d(0.5, 0.45)
+body_joint_position = pymunk.Vec2d(0.5, 0.55)
 body_joint_pixel = pymunk.Vec2d(212, 876)
 body_top_pixel = pymunk.Vec2d(212, 24)
 body_length = 0.5
@@ -44,11 +44,12 @@ ball_sprite_path = 'ball.png'
 ball_radius = 0.1
 ball_position = pymunk.Vec2d(0.9, 0.4)
 maximum_velocity = math.pi
-target_position = pymunk.Vec2d(2.5, 0.25)
-elasticity = 0.95
+target_position = pymunk.Vec2d(2.5, 0.75)
+elasticity = 0.97
 friction = 0.5
-minimal_frame_amount = 100
+minimal_frame_amount = 50
 
+font = ImageFont.truetype("JetBrainsMono-Regular.ttf", 14)
 body_sprite = Image.open(body_sprite_path)
 thigh_sprite = Image.open(thigh_sprite_path)
 tibia_sprite = Image.open(tibia_sprite_path)
@@ -300,15 +301,13 @@ def draw_sprite_with_bounding_box(frame: Image, circle_body: pymunk.Body, circle
                                                  radius_pixel)).int_tuple, mask=rotated_sprite)
 
 
-def append_frame():
+def append_frame(score: float):
     frame = Image.new('RGB', (int(space_width * pixel_scale),
                               int(space_height * pixel_scale)), '#eee')
     draw = ImageDraw.Draw(frame)
     draw_circle(draw, target_position, target_position,
                 ball_radius * pixel_scale, '#AAA')
-    draw.text((70, 10), f'{len(frames)}', fill='#000')
-    draw.text((450, 10), f'Score: {score:.5f}', fill='#000')
-    draw_line(draw, space.static_body, ground, '#000')
+    draw.multiline_text((10, 10), f'Time: {len(frames) / 10:.1f} s\nSmallest Distance: {"N/A" if math.isinf(score) else int(score * 100)} cm', font=font, fill='#000')
     draw_sprite_with_two_points(
         frame,
         thigh_body.local_to_world(thigh.a),
@@ -366,14 +365,17 @@ for keyframe in keyframes:
     for _ in range(int(keyframe['duration'] * 10)):
         for _ in range(100):
             space.step(0.01 * 0.1)
-        frame, current_score = append_frame()
+        frame, current_score = append_frame(score)
         score = min(score, current_score)
         frames.append(frame)
 if len(frames) < minimal_frame_amount:
+    hip_motor.rate = 0
+    knee_motor.rate = 0
+    ankle_motor.rate = 0
     for _ in range(minimal_frame_amount - len(frames)):
         for _ in range(100):
             space.step(0.01 * 0.1)
-        frame, current_score = append_frame()
+        frame, current_score = append_frame(score)
         score = min(score, current_score)
         frames.append(frame)
 
