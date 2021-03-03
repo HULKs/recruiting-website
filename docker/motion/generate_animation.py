@@ -52,7 +52,7 @@ elasticity = 0.97
 friction = 0.5
 minimal_frame_amount = 50
 
-font = ImageFont.truetype("JetBrainsMono-Regular.ttf", 14)
+font = ImageFont.truetype('JetBrainsMono-Regular.ttf', 14)
 body_sprite = Image.open(body_sprite_path)
 thigh_sprite = Image.open(thigh_sprite_path)
 tibia_sprite = Image.open(tibia_sprite_path)
