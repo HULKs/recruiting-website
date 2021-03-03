@@ -13,3 +13,6 @@ services:
   recruiting-website-red-ball:
     image: recruiting-website-red-ball
     build: red-ball
+  recruiting-website-motion:
+    image: recruiting-website-motion
+    build: motion
