@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 configuration = {
     'pixel_scale': 200,
     'space_width': 3,
-    'space_height': 1,
+    'space_height': 1.6875,  # 16:9 aspect ratio
     'body_sprite_path': 'body.png',
     'body_joint_position': pymunk.Vec2d(0.5, 0.45),
     'body_joint_pixel': pymunk.Vec2d(212, 876),
@@ -48,6 +48,7 @@ configuration = {
     'target_position': pymunk.Vec2d(2.5, 0.25),
     'elasticity': 0.95,
     'friction': 0.5,
+    'minimal_frame_amount': 100,
 }
 
 body_sprite = Image.open(configuration['body_sprite_path'])
@@ -200,7 +201,7 @@ space.add(
 print_options = pymunk.SpaceDebugDrawOptions()
 
 
-def draw_transform(point):
+def draw_transform(point: pymunk.Vec2d):
     return pymunk.Vec2d(
         int(point[0] * configuration['pixel_scale']),
         (configuration['space_height'] * configuration['pixel_scale']
@@ -303,6 +304,52 @@ def draw_sprite_with_bounding_box(frame: Image, circle_body: pymunk.Body, circle
                                                  radius_pixel)).int_tuple, mask=rotated_sprite)
 
 
+def append_frame():
+    frame = Image.new('RGB', (int(configuration['space_width'] * configuration['pixel_scale']),
+                              int(configuration['space_height'] * configuration['pixel_scale'])), '#eee')
+    draw = ImageDraw.Draw(frame)
+    draw_circle(draw, configuration['target_position'], configuration['target_position'],
+                configuration['ball_radius'] * configuration['pixel_scale'], '#AAA')
+    draw.text((70, 10), f'{len(frames)}', fill='#000')
+    draw.text((450, 10), f'Score: {score:.5f}', fill='#000')
+    draw_line(draw, space.static_body, ground, '#000')
+    draw_sprite_with_two_points(
+        frame,
+        thigh_body.local_to_world(thigh.a),
+        thigh_body.local_to_world(thigh.b),
+        thigh_sprite,
+        configuration['thigh_joint_a_pixel'],
+        configuration['thigh_joint_b_pixel'],
+    )
+    draw_sprite_with_two_points(
+        frame,
+        tibia_body.local_to_world(tibia.a),
+        tibia_body.local_to_world(tibia.b),
+        tibia_sprite,
+        configuration['tibia_joint_a_pixel'],
+        configuration['tibia_joint_b_pixel'],
+    )
+    draw_sprite_with_two_points(
+        frame,
+        foot_body.local_to_world(foot.a),
+        foot_body.local_to_world(foot.b),
+        foot_sprite,
+        configuration['foot_joint_a_pixel'],
+        configuration['foot_joint_b_pixel'],
+    )
+    draw_sprite_with_two_points(
+        frame,
+        thigh_body.local_to_world(thigh.a),
+        thigh_body.local_to_world(
+            thigh.a) + pymunk.Vec2d(0, configuration['body_length']),
+        body_sprite,
+        configuration['body_joint_pixel'],
+        configuration['body_top_pixel'],
+    )
+    draw_sprite_with_bounding_box(frame, ball_body, ball, ball_sprite)
+    return frame, abs(configuration['target_position'] - ball_body.position)
+
+
 frames = []
 score = float('inf')
 for keyframe in keyframes:
@@ -323,51 +370,18 @@ for keyframe in keyframes:
     for _ in range(int(keyframe['duration'] * 10)):
         for _ in range(100):
             space.step(0.01 * 0.1)
-        score = min(score, abs(
-            configuration['target_position'] - ball_body.position))
-        frame = Image.new('RGB', (configuration['space_width'] * configuration['pixel_scale'],
-                                  configuration['space_height'] * configuration['pixel_scale']), '#fff')
-        draw = ImageDraw.Draw(frame)
-        draw_circle(draw, configuration['target_position'], configuration['target_position'],
-                    configuration['ball_radius'] * configuration['pixel_scale'], '#AAA')
-        draw.text((70, 10), f'{len(frames)}', fill='#000')
-        draw.text((450, 10), f'Score: {score:.5f}', fill='#000')
-        draw_line(draw, space.static_body, ground, '#000')
-        draw_sprite_with_two_points(
-            frame,
-            thigh_body.local_to_world(thigh.a),
-            thigh_body.local_to_world(thigh.b),
-            thigh_sprite,
-            configuration['thigh_joint_a_pixel'],
-            configuration['thigh_joint_b_pixel'],
-        )
-        draw_sprite_with_two_points(
-            frame,
-            tibia_body.local_to_world(tibia.a),
-            tibia_body.local_to_world(tibia.b),
-            tibia_sprite,
-            configuration['tibia_joint_a_pixel'],
-            configuration['tibia_joint_b_pixel'],
-        )
-        draw_sprite_with_two_points(
-            frame,
-            foot_body.local_to_world(foot.a),
-            foot_body.local_to_world(foot.b),
-            foot_sprite,
-            configuration['foot_joint_a_pixel'],
-            configuration['foot_joint_b_pixel'],
-        )
-        draw_sprite_with_two_points(
-            frame,
-            thigh_body.local_to_world(thigh.a),
-            thigh_body.local_to_world(
-                thigh.a) + pymunk.Vec2d(0, configuration['body_length']),
-            body_sprite,
-            configuration['body_joint_pixel'],
-            configuration['body_top_pixel'],
-        )
-        draw_sprite_with_bounding_box(frame, ball_body, ball, ball_sprite)
+        frame, current_score = append_frame()
+        score = min(score, current_score)
+        frames.append(frame)
+if len(frames) < configuration['minimal_frame_amount']:
+    for _ in range(configuration['minimal_frame_amount'] - len(frames)):
+        for _ in range(100):
+            space.step(0.01 * 0.1)
+        frame, current_score = append_frame()
+        score = min(score, current_score)
         frames.append(frame)
 
-frames[0].save('animation.gif', save_all=True,
+print('Best Score:', score)
+
+frames[0].save('animation.webp', save_all=True,
                append_images=frames[1:], duration=100, loop=0)
