@@ -322,7 +322,6 @@ def append_frame(score: float):
     ball_x = ball.bb.left + ((ball.bb.right - ball.bb.left) / 2)
     ball_y = ball.bb.bottom + ((ball.bb.top - ball.bb.bottom) / 2)
     ball_distance_from_ground = ball_y - ball_radius - ground_y - ground_radius
-    print(ball_distance_from_ground)
     ball_shadow_scale = max(0, 1 - ball_distance_from_ground)
     draw.ellipse([
         draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) + (ball_shadow_radius * ball_shadow_scale)),
