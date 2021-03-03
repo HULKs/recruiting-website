@@ -8,8 +8,10 @@ configuration = {
     'pixel_scale': 200,
     'space_width': 3,
     'space_height': 1,
-    'hip_x': 0.5,
-    'hip_y': 0.45,
+    'hip_position': pymunk.Vec2d(0.5, 0.45),
+    'thigh_image_path': '',
+    'thigh_joint_a_pixel': pymunk.Vec2d(42, 42),
+    'thigh_joint_b_pixel': pymunk.Vec2d(42, 42),
     'thigh_angle': 315,
     'thigh_angle_min': -90,
     'thigh_angle_max': 45,
@@ -28,11 +30,9 @@ configuration = {
     'ground_y': 0.05,
     'ground_radius': 0.05,
     'ball_radius': 0.1,
-    'ball_x': 0.9,
-    'ball_y': 0.4,
+    'ball_position': pymunk.Vec2d(0.9, 0.4),
     'maximum_velocity': math.pi,
-    'target_x': 2.5,
-    'target_y': 0.25,
+    'target_position': pymunk.Vec2d(2.5, 0.25),
 }
 
 space = pymunk.Space()
@@ -48,7 +48,7 @@ ground = pymunk.Segment(
 ground.elasticity = 1.0  # enable ball bounce
 
 ball_body = pymunk.Body()
-ball_body.position = configuration['ball_x'], configuration['ball_y']
+ball_body.position = configuration['ball_position']
 ball_body.moment = 1
 ball = pymunk.Circle(ball_body, radius=configuration['ball_radius'])
 ball.mass = 1
@@ -98,7 +98,7 @@ def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: 
 
 thigh_body, thigh, hip_joint, hip_limit_joint, hip_motor = attach_segment(
     space.static_body,
-    pymunk.Vec2d(configuration['hip_x'], configuration['hip_y']),
+    configuration['hip_position'],
     configuration['thigh_angle'],
     configuration['thigh_angle_min'],
     configuration['thigh_angle_max'],
@@ -150,7 +150,7 @@ space.add(
 print_options = pymunk.SpaceDebugDrawOptions()
 
 def draw_transform(p):
-    return  pymunk.vec2d.Vec2d(
+    return  pymunk.Vec2d(
         int(p[0] * configuration['pixel_scale']),
         (configuration['space_height'] * configuration['pixel_scale']) -
         int(p[1] * configuration['pixel_scale']),
@@ -158,8 +158,8 @@ def draw_transform(p):
 
 def draw_circle(draw, a, b, color: str, radius=0):
     draw.ellipse([
-        draw_transform(a) - pymunk.vec2d.Vec2d(radius, radius),
-        draw_transform(b) + pymunk.vec2d.Vec2d(radius, radius)
+        draw_transform(a) - pymunk.Vec2d(radius, radius),
+        draw_transform(b) + pymunk.Vec2d(radius, radius)
     ], fill=color)
 
 def draw_line(draw, body: pymunk.Body, segment: pymunk.Segment, color: str):
@@ -200,8 +200,6 @@ def get_current_angles(thigh_body: pymunk.Body, thigh: pymunk.Segment, tibia_bod
 def clamp(v, low, high):
     return max(low, min(high, v))
 
-target_position = pymunk.vec2d.Vec2d(configuration['target_x'], configuration['target_y'])
-
 frames = []
 score = float('inf')
 for keyframe in keyframes:
@@ -212,20 +210,18 @@ for keyframe in keyframes:
     hip_angle_velocity = clamp(hip_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
     knee_angle_velocity = clamp(knee_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
     ankle_angle_velocity = clamp(ankle_angle_difference / keyframe['duration'], -configuration['maximum_velocity'], configuration['maximum_velocity'])
-    # TODO: clamp velocity @PasGl
-    # TODO: limit angles @PasGl
     hip_motor.rate = -hip_angle_velocity
     knee_motor.rate = -knee_angle_velocity
     ankle_motor.rate = -ankle_angle_velocity
     for _ in range(int(keyframe['duration'] * 10)):
         for _ in range(100):
             space.step(0.01 * 0.1)
-        score = min(score, abs(target_position - ball_body.position))
+        score = min(score, abs(configuration['target_position'] - ball_body.position))
         # space.debug_draw(print_options)
         frame = Image.new('RGB', (configuration['space_width'] * configuration['pixel_scale'],
                                 configuration['space_height'] * configuration['pixel_scale']), '#fff')
         draw = ImageDraw.Draw(frame)
-        draw_circle(draw, target_position, target_position, '#AAA', configuration['ball_radius'] * configuration['pixel_scale'])
+        draw_circle(draw, configuration['target_position'], configuration['target_position'], '#AAA', configuration['ball_radius'] * configuration['pixel_scale'])
         draw.text((70, 10), f'{len(frames)}', fill='#000')
         draw.text((450, 10), f'Score: {score:.5f}', fill='#000')
         draw_line(draw, space.static_body, ground, '#000')
@@ -235,5 +231,5 @@ for keyframe in keyframes:
         draw_circle(draw, (ball.bb.left, ball.bb.top), (ball.bb.right, ball.bb.bottom), '#000')
         frames.append(frame)
 
-frames[0].save('joint.webp', save_all=True,
+frames[0].save('animation.gif', save_all=True,
                append_images=frames[1:], duration=100, loop=0)
