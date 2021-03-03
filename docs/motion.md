@@ -1,6 +1,6 @@
 # Motion Task
 
-<x-prologue image="recruiting-website-motion" command="bash -c 'cp /usr/src/app/{generate_animation.py,*.png} /data/ && echo Initialized files.'" />
+<x-prologue image="recruiting-website-motion" command="bash -c 'cp /usr/src/app/{generate_animation.py,*.png,*.ttf} /data/ && echo Initialized files.'" />
 
 <x-text-editor file="/data/generate_animation.py" mode="python" />
 
