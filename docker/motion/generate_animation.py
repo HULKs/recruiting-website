@@ -47,11 +47,14 @@ ground_sprite_path = 'ground.png'
 ground_y = 0.05
 ground_radius = 0.05
 ball_sprite_path = 'ball.png'
+ghost_ball_sprite_path = 'ghost_ball.png'
 ball_radius = 0.1
 ball_position = pymunk.Vec2d(1.0, 1.0)
 ball_shadow_radius = pymunk.Vec2d(-0.1, 0.0175)
 maximum_velocity = math.pi
 target_position = pymunk.Vec2d(2.5, 0.75)
+target_radius = ball_radius * 1.5
+target_sprite_path = 'hypno_target.png'
 elasticity = 0.93
 friction = 0.5
 minimal_frame_amount = 50
@@ -62,6 +65,8 @@ thigh_sprite = Image.open(thigh_sprite_path)
 tibia_sprite = Image.open(tibia_sprite_path)
 foot_sprite = Image.open(foot_sprite_path)
 ball_sprite = Image.open(ball_sprite_path)
+ghost_ball_sprite = Image.open(ghost_ball_sprite_path)
+target_sprite = Image.open(target_sprite_path)
 
 ground_sprite = Image.open(ground_sprite_path)
 ground_sprite_height = int(
@@ -294,14 +299,8 @@ def draw_sprite_with_two_points(frame: Image, joint_a: pymunk.Vec2d, joint_b: py
                                 scaled_sprite_joint_a_pixel).int_tuple, mask=scaled_sprite)
 
 
-def draw_sprite_with_bounding_box(frame: Image, circle_body: pymunk.Body, circle: pymunk.Circle, sprite: Image):
-    upper_left = pymunk.Vec2d(circle.bb.left, circle.bb.top)
-    bounding_box_size = pymunk.Vec2d(
-        circle.bb.right - circle.bb.left, circle.bb.bottom - circle.bb.top)
-    center = upper_left + (bounding_box_size / 2)
-    radius = circle.bb.right - center.x
-    angle_degrees = math.degrees(circle_body.angle)
-    center_pixel = draw_transform(center)
+def draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame: Image, center_point: pymunk.Vec2d, radius: float, angle_degrees: float, sprite: Image):
+    center_pixel = draw_transform(center_point)
     radius_pixel = radius * pixel_scale
     resized_sprite = sprite.resize(
         (int(radius_pixel * 2), int(radius_pixel * 2)))
@@ -309,8 +308,13 @@ def draw_sprite_with_bounding_box(frame: Image, circle_body: pymunk.Body, circle
     frame.paste(rotated_sprite, (center_pixel - (radius_pixel,
                                                  radius_pixel)).int_tuple, mask=rotated_sprite)
 
+def get_current_ball_position():
+    ball_x = ball.bb.left + ((ball.bb.right - ball.bb.left) / 2)
+    ball_y = ball.bb.bottom + ((ball.bb.top - ball.bb.bottom) / 2)
+    return pymunk.Vec2d(ball_x, ball_y)
 
-def append_frame(score: float):
+
+def current_frame(score: float, ghost_ball_position: pymunk.Vec2d, ghost_ball_rotation: float):
     frame = Image.new('RGB', (int(space_width * pixel_scale),
                               int(space_height * pixel_scale)), '#eee')
     frame.paste(ground_sprite, (0, int(
@@ -322,8 +326,7 @@ def append_frame(score: float):
         draw_transform(pymunk.Vec2d(body_joint_position.x,
                                     ground_y + ground_radius) - body_shadow_radius),
     ], fill=(0, 0, 0, 127))
-    ball_x = ball.bb.left + ((ball.bb.right - ball.bb.left) / 2)
-    ball_y = ball.bb.bottom + ((ball.bb.top - ball.bb.bottom) / 2)
+    ball_x, ball_y = get_current_ball_position()
     ball_distance_from_ground = ball_y - ball_radius - ground_y - ground_radius
     ball_shadow_scale = max(0, 1 - ball_distance_from_ground)
     draw.ellipse([
@@ -332,8 +335,7 @@ def append_frame(score: float):
         draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) -
                        (ball_shadow_radius * ball_shadow_scale)),
     ], fill=(0, 0, 0, 127))
-    draw_circle(draw, target_position, target_position,
-                ball_radius * pixel_scale, '#AAA')
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, target_position, target_radius, 0, target_sprite)
     draw.multiline_text(
         (10, 10), f'Time: {len(frames) / 10:.1f} s\nSmallest Distance: {"N/A" if math.isinf(score) else int(score * 100)} cm', font=font, fill='#000')
     draw_sprite_with_two_points(
@@ -368,12 +370,18 @@ def append_frame(score: float):
         body_joint_pixel,
         body_top_pixel,
     )
-    draw_sprite_with_bounding_box(frame, ball_body, ball, ball_sprite)
-    return frame, abs(target_position - ball_body.position)
+    center = get_current_ball_position()
+    radius = ball_radius
+    angle_degrees = math.degrees(ball_body.angle)
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, ghost_ball_position, radius, ghost_ball_rotation, ghost_ball_sprite)
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, center, radius, angle_degrees, ball_sprite)
+    return frame
 
 
 frames = []
 score = float('inf')
+ghost_ball_position = get_current_ball_position()
+ghost_ball_rotation = math.degrees(ball_body.angle)
 for keyframe in keyframes:
     hip_angle, knee_angle, ankle_angle = get_current_angles(
         thigh_body, thigh, tibia_body, tibia, foot_body, foot)
@@ -392,8 +400,12 @@ for keyframe in keyframes:
     for _ in range(int(keyframe['duration'] * 10)):
         for _ in range(100):
             space.step(0.01 * 0.1)
-        frame, current_score = append_frame(score)
-        score = min(score, current_score)
+        current_score = abs(target_position - ball_body.position)
+        if current_score < score:
+            ghost_ball_position = get_current_ball_position()
+            ghost_ball_rotation = math.degrees(ball_body.angle)
+            score = current_score
+        frame = current_frame(score, ghost_ball_position, ghost_ball_rotation)
         frames.append(frame)
 if len(frames) < minimal_frame_amount:
     hip_motor.rate = 0
@@ -402,8 +414,12 @@ if len(frames) < minimal_frame_amount:
     for _ in range(minimal_frame_amount - len(frames)):
         for _ in range(100):
             space.step(0.01 * 0.1)
-        frame, current_score = append_frame(score)
-        score = min(score, current_score)
+        current_score = abs(target_position - ball_body.position)
+        if current_score < score:
+            ghost_ball_position = get_current_ball_position()
+            ghost_ball_rotation = math.degrees(ball_body.angle)
+            score = current_score
+        frame = current_frame(score, ghost_ball_position, ghost_ball_rotation)
         frames.append(frame)
 
 print('Best Score:', score)
