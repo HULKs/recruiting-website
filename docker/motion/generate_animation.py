@@ -401,5 +401,5 @@ if len(frames) < minimal_frame_amount:
 
 print('Best Score:', score)
 
-frames[0].save('animation.webp', save_all=True,
+frames[0].save('neutralAngles.png', save_all=True,
                append_images=frames[1:], duration=100, loop=0)
