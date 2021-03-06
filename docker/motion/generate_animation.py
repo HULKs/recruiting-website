@@ -3,6 +3,7 @@ import typing
 import pymunk
 import pymunk.constraints
 from PIL import Image, ImageDraw, ImageFont
+import generate_keyframes
 
 pixel_scale = 200
 space_width = 3
@@ -21,6 +22,7 @@ thigh_angle_min = -90
 thigh_angle_max = 45
 thigh_length = 0.2
 thigh_radius = 0.05
+thigh_mass = 0.4
 tibia_sprite_path = 'tibia.png'
 tibia_joint_a_pixel = pymunk.Vec2d(184, -44)
 tibia_joint_b_pixel = pymunk.Vec2d(183, 382)
@@ -29,6 +31,7 @@ tibia_angle_min = -45
 tibia_angle_max = 90
 tibia_length = 0.2
 tibia_radius = 0.05
+tibia_mass = 0.4
 foot_sprite_path = 'foot.png'
 foot_joint_a_pixel = pymunk.Vec2d(513, 125)
 foot_joint_b_pixel = pymunk.Vec2d(1224, 416)
@@ -39,6 +42,7 @@ foot_length = 0.15
 foot_radius = 0.025
 foot_heel_angle = 219
 foot_heel_length = 0.1
+foot_mass = 0.2
 ground_sprite_path = 'ground.png'
 ground_y = 0.05
 ground_radius = 0.05
@@ -48,7 +52,7 @@ ball_position = pymunk.Vec2d(1.0, 1.0)
 ball_shadow_radius = pymunk.Vec2d(-0.1, 0.0175)
 maximum_velocity = math.pi
 target_position = pymunk.Vec2d(2.5, 0.75)
-elasticity = 0.97
+elasticity = 0.93
 friction = 0.5
 minimal_frame_amount = 50
 
@@ -82,12 +86,12 @@ ball_body = pymunk.Body()
 ball_body.position = ball_position
 ball_body.moment = 1
 ball = pymunk.Circle(ball_body, radius=ball_radius)
-ball.mass = 1
+ball.mass = 0.1
 ball.elasticity = elasticity
 ball.friction = friction
 
 
-def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: float, angle_min: float, angle_max: float, length: float, radius: float) -> typing.Tuple[pymunk.Body, pymunk.Shape, pymunk.constraints.PivotJoint, pymunk.constraints.SimpleMotor]:
+def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: float, angle_min: float, angle_max: float, length: float, radius: float, mass: float) -> typing.Tuple[pymunk.Body, pymunk.Shape, pymunk.constraints.PivotJoint, pymunk.constraints.SimpleMotor]:
     segment_body = pymunk.Body()
     segment_body.position = anchor_point.x, anchor_point.y
     segment_body.moment = 1
@@ -98,7 +102,7 @@ def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: 
          math.sin(math.radians(angle)) * length),
         radius=radius,
     )
-    segment.mass = 1
+    segment.mass = mass
     segment.elasticity = elasticity
     segment.friction = friction
     segment.filter = pymunk.ShapeFilter(group=1)
@@ -124,7 +128,7 @@ def attach_segment(anchor_body: pymunk.Body, anchor_point: pymunk.Vec2d, angle: 
         segment_body,
         math.pi * 0.25,
     )
-    motor.max_force = 10
+    motor.max_force = 2.3
 
     return segment_body, segment, pivot_joint, limit_joint, motor
 
@@ -137,6 +141,7 @@ thigh_body, thigh, hip_joint, hip_limit_joint, hip_motor = attach_segment(
     thigh_angle_max,
     thigh_length,
     thigh_radius,
+    thigh_mass,
 )
 
 tibia_body, tibia, knee_joint, knee_limit_joint, knee_motor = attach_segment(
@@ -147,6 +152,7 @@ tibia_body, tibia, knee_joint, knee_limit_joint, knee_motor = attach_segment(
     tibia_angle_max,
     tibia_length,
     tibia_radius,
+    tibia_mass,
 )
 
 foot_body, foot, ankle_joint, ankle_limit_joint, ankle_motor = attach_segment(
@@ -157,6 +163,7 @@ foot_body, foot, ankle_joint, ankle_limit_joint, ankle_motor = attach_segment(
     foot_angle_max,
     foot_length,
     foot_radius,
+    foot_mass/3,
 )
 
 heel_vector = pymunk.Vec2d(foot_heel_length, 0).rotated_degrees(
@@ -167,7 +174,7 @@ heel_segment = pymunk.Segment(
     heel_vector,
     radius=foot_radius,
 )
-heel_segment.mass = 1
+heel_segment.mass = foot_mass/3
 heel_segment.elasticity = elasticity
 heel_segment.friction = friction
 heel_segment.filter = pymunk.ShapeFilter(group=1)
@@ -178,7 +185,7 @@ sole_segment = pymunk.Segment(
     heel_vector,
     radius=foot_radius,
 )
-sole_segment.mass = 1
+sole_segment.mass = foot_mass/3
 sole_segment.elasticity = elasticity
 sole_segment.friction = friction
 sole_segment.filter = pymunk.ShapeFilter(group=1)
@@ -233,15 +240,7 @@ def draw_line(draw: ImageDraw, body: pymunk.Body, segment: pymunk.Segment, color
 
 
 # angles in radians
-keyframes = [
-    {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 0.1},
-    {'hip_angle': math.pi / 2, 'knee_angle': math.pi /
-        2, 'ankle_angle': math.pi / 2, 'duration': 0.1},
-    {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 1},
-    {'hip_angle': -math.pi / 2, 'knee_angle': -math.pi /
-        2, 'ankle_angle': -math.pi / 2, 'duration': 1},
-    {'hip_angle': 0, 'knee_angle': 0, 'ankle_angle': 0, 'duration': 1},
-]
+keyframes = generate_keyframes.generate_keyframes()
 
 
 def normalize_angle(input_angle: float) -> float:
