@@ -12,7 +12,7 @@ body_sprite_path = 'body.png'
 body_joint_position = pymunk.Vec2d(0.5, 0.55)
 body_joint_pixel = pymunk.Vec2d(212, 876)
 body_top_pixel = pymunk.Vec2d(212, 24)
-body_length = 0.5
+body_length = 0.55
 body_shadow_radius = pymunk.Vec2d(-0.35, 0.025)
 thigh_sprite_path = 'thigh.png'
 thigh_joint_a_pixel = pymunk.Vec2d(191, 69)
@@ -43,14 +43,20 @@ foot_radius = 0.025
 foot_heel_angle = 219
 foot_heel_length = 0.1
 foot_mass = 0.2
+leg_sprite_path = 'leg.png'
+leg_joint_pixel = pymunk.Vec2d(200, 48)
+leg_bottom_pixel = pymunk.Vec2d(200, 1000)
+leg_length = 0.45
 ground_sprite_path = 'ground.png'
 ground_y = 0.05
 ground_radius = 0.05
 ball_sprite_path = 'ball.png'
-ghost_ball_sprite_path = 'ghost_ball.png'
 ball_radius = 0.1
-ball_position = pymunk.Vec2d(1.0, 1.0)
+ball_position = pymunk.Vec2d(0.8, 1.0)
 ball_shadow_radius = pymunk.Vec2d(-0.1, 0.0175)
+ball_shadow_sprite_path = 'ball_shadow.png'
+ghost_ball_sprite_path = 'ghost_ball.png'
+ghost_ball_shadow_sprite_path = 'ghost_ball_shadow.png'
 maximum_velocity = math.pi
 target_position = pymunk.Vec2d(2.5, 0.75)
 target_radius = ball_radius * 1.5
@@ -64,8 +70,11 @@ body_sprite = Image.open(body_sprite_path)
 thigh_sprite = Image.open(thigh_sprite_path)
 tibia_sprite = Image.open(tibia_sprite_path)
 foot_sprite = Image.open(foot_sprite_path)
+leg_sprite = Image.open(leg_sprite_path)
 ball_sprite = Image.open(ball_sprite_path)
+ball_shadow_sprite = Image.open(ball_shadow_sprite_path)
 ghost_ball_sprite = Image.open(ghost_ball_sprite_path)
+ghost_ball_shadow_sprite = Image.open(ghost_ball_shadow_sprite_path)
 target_sprite = Image.open(target_sprite_path)
 
 ground_sprite = Image.open(ground_sprite_path)
@@ -262,7 +271,7 @@ def get_current_angles(thigh_body: pymunk.Body, thigh: pymunk.Segment, tibia_bod
     foot_vector = foot_body.local_to_world(
         foot.b) - foot_body.local_to_world(foot.a)
     return (
-        normalize_angle(thigh_vector.angle),
+        normalize_angle(thigh_vector.angle - math.radians(thigh_angle)),
         normalize_angle(tibia_vector.angle - thigh_vector.angle),
         normalize_angle(
             (foot_vector.angle - tibia_vector.angle - (math.pi / 2)) % (2 * math.pi)),
@@ -327,17 +336,26 @@ def current_frame(score: float, ghost_ball_position: pymunk.Vec2d, ghost_ball_ro
                                     ground_y + ground_radius) - body_shadow_radius),
     ], fill=(0, 0, 0, 127))
     ball_x, ball_y = get_current_ball_position()
-    ball_distance_from_ground = ball_y - ball_radius - ground_y - ground_radius
-    ball_shadow_scale = max(0, 1 - ball_distance_from_ground)
-    draw.ellipse([
-        draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) +
-                       (ball_shadow_radius * ball_shadow_scale)),
-        draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) -
-                       (ball_shadow_radius * ball_shadow_scale)),
-    ], fill=(0, 0, 0, 127))
+    if ball_y >= 0:
+        ball_distance_from_ground = ball_y - ball_radius - ground_y - ground_radius
+        ball_shadow_scale = max(0, 1 - ball_distance_from_ground)
+        draw.ellipse([
+            draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) +
+                           (ball_shadow_radius * ball_shadow_scale)),
+            draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) -
+                           (ball_shadow_radius * ball_shadow_scale)),
+        ], fill=(0, 0, 0, 127))
     draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, target_position, target_radius, 0, target_sprite)
     draw.multiline_text(
         (10, 10), f'Time: {len(frames) / 10:.1f} s\nSmallest Distance: {"N/A" if math.isinf(score) else int(score * 100)} cm', font=font, fill='#000')
+    draw_sprite_with_two_points(
+        frame,
+        body_joint_position - pymunk.Vec2d(0, leg_length),
+        body_joint_position,
+        leg_sprite,
+        leg_bottom_pixel,
+        leg_joint_pixel,
+    )
     draw_sprite_with_two_points(
         frame,
         thigh_body.local_to_world(thigh.a),
@@ -374,7 +392,9 @@ def current_frame(score: float, ghost_ball_position: pymunk.Vec2d, ghost_ball_ro
     radius = ball_radius
     angle_degrees = math.degrees(ball_body.angle)
     draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, ghost_ball_position, radius, ghost_ball_rotation, ghost_ball_sprite)
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, ghost_ball_position, radius, 0, ghost_ball_shadow_sprite)
     draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, center, radius, angle_degrees, ball_sprite)
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, center, radius, 0, ball_shadow_sprite)
     return frame
 
 
@@ -400,11 +420,11 @@ for keyframe in keyframes:
     for _ in range(int(keyframe['duration'] * 10)):
         for _ in range(100):
             space.step(0.01 * 0.1)
-        current_score = abs(target_position - ball_body.position)
-        if current_score < score:
-            ghost_ball_position = get_current_ball_position()
-            ghost_ball_rotation = math.degrees(ball_body.angle)
-            score = current_score
+            current_score = abs(target_position - ball_body.position)
+            if current_score < score:
+                ghost_ball_position = get_current_ball_position()
+                ghost_ball_rotation = math.degrees(ball_body.angle)
+                score = current_score
         frame = current_frame(score, ghost_ball_position, ghost_ball_rotation)
         frames.append(frame)
 if len(frames) < minimal_frame_amount:
@@ -414,11 +434,11 @@ if len(frames) < minimal_frame_amount:
     for _ in range(minimal_frame_amount - len(frames)):
         for _ in range(100):
             space.step(0.01 * 0.1)
-        current_score = abs(target_position - ball_body.position)
-        if current_score < score:
-            ghost_ball_position = get_current_ball_position()
-            ghost_ball_rotation = math.degrees(ball_body.angle)
-            score = current_score
+            current_score = abs(target_position - ball_body.position)
+            if current_score < score:
+                ghost_ball_position = get_current_ball_position()
+                ghost_ball_rotation = math.degrees(ball_body.angle)
+                score = current_score
         frame = current_frame(score, ghost_ball_position, ghost_ball_rotation)
         frames.append(frame)
 
