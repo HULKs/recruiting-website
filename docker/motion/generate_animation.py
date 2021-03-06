@@ -64,7 +64,8 @@ foot_sprite = Image.open(foot_sprite_path)
 ball_sprite = Image.open(ball_sprite_path)
 
 ground_sprite = Image.open(ground_sprite_path)
-ground_sprite_height = int(space_width * pixel_scale / ground_sprite.size[0] * ground_sprite.size[1])
+ground_sprite_height = int(
+    space_width * pixel_scale / ground_sprite.size[0] * ground_sprite.size[1])
 ground_sprite = ground_sprite.resize(
     (space_width * pixel_scale, ground_sprite_height))
 
@@ -312,23 +313,29 @@ def draw_sprite_with_bounding_box(frame: Image, circle_body: pymunk.Body, circle
 def append_frame(score: float):
     frame = Image.new('RGB', (int(space_width * pixel_scale),
                               int(space_height * pixel_scale)), '#eee')
-    frame.paste(ground_sprite, (0, int((space_height * pixel_scale) - ground_sprite_height)), mask=ground_sprite)
-    draw = ImageDraw.Draw(frame)
+    frame.paste(ground_sprite, (0, int(
+        (space_height * pixel_scale) - ground_sprite_height)), mask=ground_sprite)
+    draw = ImageDraw.Draw(frame, mode='RGBA')
     draw.ellipse([
-        draw_transform(pymunk.Vec2d(body_joint_position.x, ground_y + ground_radius) + body_shadow_radius),
-        draw_transform(pymunk.Vec2d(body_joint_position.x, ground_y + ground_radius) - body_shadow_radius),
-    ], fill='#000')
+        draw_transform(pymunk.Vec2d(body_joint_position.x,
+                                    ground_y + ground_radius) + body_shadow_radius),
+        draw_transform(pymunk.Vec2d(body_joint_position.x,
+                                    ground_y + ground_radius) - body_shadow_radius),
+    ], fill=(0, 0, 0, 127))
     ball_x = ball.bb.left + ((ball.bb.right - ball.bb.left) / 2)
     ball_y = ball.bb.bottom + ((ball.bb.top - ball.bb.bottom) / 2)
     ball_distance_from_ground = ball_y - ball_radius - ground_y - ground_radius
     ball_shadow_scale = max(0, 1 - ball_distance_from_ground)
     draw.ellipse([
-        draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) + (ball_shadow_radius * ball_shadow_scale)),
-        draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) - (ball_shadow_radius * ball_shadow_scale)),
-    ], fill='#000')
+        draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) +
+                       (ball_shadow_radius * ball_shadow_scale)),
+        draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) -
+                       (ball_shadow_radius * ball_shadow_scale)),
+    ], fill=(0, 0, 0, 127))
     draw_circle(draw, target_position, target_position,
                 ball_radius * pixel_scale, '#AAA')
-    draw.multiline_text((10, 10), f'Time: {len(frames) / 10:.1f} s\nSmallest Distance: {"N/A" if math.isinf(score) else int(score * 100)} cm', font=font, fill='#000')
+    draw.multiline_text(
+        (10, 10), f'Time: {len(frames) / 10:.1f} s\nSmallest Distance: {"N/A" if math.isinf(score) else int(score * 100)} cm', font=font, fill='#000')
     draw_sprite_with_two_points(
         frame,
         thigh_body.local_to_world(thigh.a),
@@ -401,5 +408,5 @@ if len(frames) < minimal_frame_amount:
 
 print('Best Score:', score)
 
-frames[0].save('neutralAngles.png', save_all=True,
+frames[0].save('animation.webp', save_all=True,
                append_images=frames[1:], duration=100, loop=0)
