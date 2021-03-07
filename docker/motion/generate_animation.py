@@ -4,6 +4,7 @@ import pymunk
 import pymunk.constraints
 from PIL import Image, ImageDraw, ImageFont
 import generate_keyframes
+<<<<<<< HEAD
 
 pixel_scale = 200
 space_width = 3
@@ -64,6 +65,9 @@ target_sprite_path = 'hypno_target.png'
 elasticity = 0.93
 friction = 0.5
 minimal_frame_amount = 50
+=======
+from .config import *
+>>>>>>> 15c469a (Extract configuration)
 
 font = ImageFont.truetype('JetBrainsMono-Regular.ttf', 14)
 body_sprite = Image.open(body_sprite_path)
