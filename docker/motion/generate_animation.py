@@ -4,7 +4,7 @@ import pymunk
 import pymunk.constraints
 from PIL import Image, ImageDraw, ImageFont
 import generate_keyframes
-from .config import *
+from configuration import *
 
 font = ImageFont.truetype('JetBrainsMono-Regular.ttf', 14)
 body_sprite = Image.open(body_sprite_path)
