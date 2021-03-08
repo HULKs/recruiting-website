@@ -4,12 +4,9 @@ import scene
 
 
 def forward_kinematics(position_0: pymunk.Vec2d,
-                       theta_1: float,
-                       length_1: float,
-                       theta_2: float,
-                       length_2: float,
-                       theta_3: float,
-                       length_3: float):
+                       theta_1: float, length_1: float,
+                       theta_2: float, length_2: float,
+                       theta_3: float, length_3: float):
     # calculate position_1
     theta_1_with_offset = theta_1 - math.radians(45)
     position_1 = pymunk.Vec2d(
