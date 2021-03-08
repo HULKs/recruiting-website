@@ -47,7 +47,7 @@ position_1, position_2, position_3, rotation_3 = forward_kinematics(
 )
 
 # drawing
-joint_draw_radius = 0.02
+joint_draw_radius = 0.0175
 joint_draw_thickness = 0.01
 position_offset = pymunk.Vec2d(0.05, 0)
 s = scene.Scene(1, 0.65, 720)
@@ -56,6 +56,10 @@ s.draw_circle(position_0, joint_draw_radius, '#000')
 s.draw_line(position_0, position_1, joint_draw_thickness, '#000')
 s.draw_circle(position_1, joint_draw_radius, '#000')
 s.draw_line(position_1, position_2, joint_draw_thickness, '#000')
+heel_position = position_2 + \
+    pymunk.Vec2d(0.1, 0).rotated(rotation_3 + math.radians(23.39+180+39))
+s.draw_line(position_2, heel_position, joint_draw_thickness, '#888')
+s.draw_line(heel_position, position_3, joint_draw_thickness, '#888')
 s.draw_circle(position_2, joint_draw_radius, '#000')
 s.draw_line(position_2, position_3, joint_draw_thickness, '#000')
 s.draw_circle(position_3, joint_draw_radius, '#000')
