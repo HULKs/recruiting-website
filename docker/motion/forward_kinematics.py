@@ -50,8 +50,8 @@ position_1, position_2, position_3, rotation_3 = forward_kinematics(
 joint_draw_radius = 0.0175
 joint_draw_thickness = 0.01
 position_offset = pymunk.Vec2d(0.05, 0)
-s = scene.Scene(1.1333, 0.65, 720)
-s.draw_line(pymunk.Vec2d(0.5, 0.65), position_0, joint_draw_thickness, '#888')
+s = scene.Scene(1.1333, 0.6, 720)
+s.draw_line(pymunk.Vec2d(0.5, 0.6), position_0, joint_draw_thickness, '#888')
 s.draw_circle(position_0, joint_draw_radius, '#000')
 s.draw_line(position_0, position_1, joint_draw_thickness, '#000')
 s.draw_circle(position_1, joint_draw_radius, '#000')
