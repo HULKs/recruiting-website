@@ -288,7 +288,7 @@ def current_frame(score: float, ghost_ball_position: pymunk.Vec2d, ghost_ball_ro
         ], fill=(0, 0, 0, 127))
     draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, target_position, target_radius, 0, target_sprite)
     draw.multiline_text(
-        (10, 10), f'Time: {len(frames) / 10:.1f} s\nSmallest Distance: {"N/A" if math.isinf(score) else int(score * 100)} cm', font=font, fill='#000')
+        (10, 10), f'Time: {len(frames) / 10:.1f} s\nSmallest Distance: {int(score * 100)} cm', font=font, fill='#000')
     draw_sprite_with_two_points(
         frame,
         body_joint_position - pymunk.Vec2d(0, leg_length),
@@ -383,7 +383,7 @@ if len(frames) < minimal_frame_amount:
         frame = current_frame(score, ghost_ball_position, ghost_ball_rotation)
         frames.append(frame)
 
-print('Best Score:', score)
+print(f'Smallest Distance: {int(score * 100)} cm')
 
 frames[0].save('animation.webp', save_all=True,
                append_images=frames[1:], duration=100, loop=0)
