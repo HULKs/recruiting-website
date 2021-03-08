@@ -66,8 +66,20 @@ position_3 = Vec2d(
 )
 ```
 
+When combining all calculations together we can now calculate all positions and rotations of the joints given the joint angles. In the following code the forward kinematics calculations are defined in the function `forward_kinematics()`. The function gets the initial position `position_0`, all joint angles `theta_*`, and segment lengths `length_*`. It returns all joint positions and the rotation of the end effector (at `position_3`, i.e. `rotation_3`):
+
 <x-text-editor file="/data/forward_kinematics.py" mode="python" />
+
+You can execute the above code by clicking the following button. Feel free to change the code (e.g. the angles `theta_*`).
 
 <x-button image="recruiting-website-motion" command="python forward_kinematics.py" label="Apply forward kinematics" working-directory="/data" />
 
+The output shows a visualization of the calculated joint positions with the help of the forward kinematics:
+
 <x-image-viewer file="/data/forward_kinematics.png" mime="image/png" />
+
+We can see that the forward kinematics are an easy way to calculate the end effector position and rotation given all joint angles and segment lengths. In the next section we will use the inverse kinematics to calculate the joint angles from a given end effector position and rotation.
+
+### Inverse Kinematics
+
+
