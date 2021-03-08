@@ -3,7 +3,7 @@ import pymunk
 
 pixel_scale = 200
 space_width = 3
-space_height = 1.6875  # 16:9 aspect ratio
+space_height = 1.588235294  # 16:9 aspect ratio
 body_sprite_path = 'body.png'
 body_joint_position = pymunk.Vec2d(0.5, 0.55)
 body_joint_pixel = pymunk.Vec2d(212, 876)
