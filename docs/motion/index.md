@@ -8,7 +8,7 @@ In this task you are supposed to help the Nao robot kick the ball as close to th
 
 Note that every joint has a minimum and maximum angle.
 
-If you want to test your code, you can click the "Run program" button below to see a visualisation of your code. In the left upper corner, you can see the time that has passed (in seconds) and the number below that shows the smallest distance between the ball and the target that you achieved with your current code.
+If you want to test your code, you can click the "Generate animation" button below to see a visualisation of your code. In the left upper corner, you can see the time that has passed (in seconds) and the number below that shows the smallest distance between the ball and the target that you achieved with your current code.
 
 ## Keyframes
 
@@ -19,9 +19,9 @@ The position of the three joints and the neutral angles can be seen in the pictu
 
 <x-text-editor file="/data/generate_keyframes.py" mode="python" />
 
-<x-button image="recruiting-website-motion" command="python generate_animation.py" label="Run program" working-directory="/data" />
+<x-button image="recruiting-website-motion" command="python generate_animation.py" label="Generate animation" working-directory="/data" />
 
-<x-image-viewer file="/data/animation.webp" mime="image/gif" />
+<x-image-viewer file="/data/animation.webp" mime="image/webp" />
 
 ## Kinematic Chain
 
@@ -31,7 +31,7 @@ In the following sections, we explore how [end effector](https://en.wikipedia.or
 
 With the so called [forward kinematics](https://en.wikipedia.org/wiki/Forward_kinematics) one can calculate the position of the end effector from the set of involved joint angles. Just from common sense it is obvious, that such a calculation is possible, because the position in space is exactly defined, when given all joint angles. Since we want to control the robot's leg, we need a model of the leg first. Recall to the leg structure that we introduced earlier:
 
-New Image: ![](joint_angles.png)
+![](kinematic_chain.png)
 
 The kinematic chain is constructed starting at the body of the robot where the leg is mounted. In our case this is the position of the hip joint or `position_0`. For calculating `position_1` at the end of the thigh with the length `length_1` and angle `theta_1`:
 
@@ -55,13 +55,19 @@ position_2 = Vec2d(
 )
 ```
 
-Lastly, the end position of the foot span `position_3` is rotated by `theta_3` around `position_2` and translated by `length_3`. Again, `theta_1` and `theta_2` are added to `theta_3`:
+Lastly, the end position of the foot span `position_3` is rotated by `theta_3` around `position_2` and translated by `length_3`. Again, the previous rotation `theta_2` is added to `theta_3`:
 
 ```python
-theta_3_with_offset = theta_1_with_offset + theta_2_with_offset + theta_3 + math.radians(111.61)
+theta_3_with_offset = theta_2_with_offset + theta_3 + math.radians(111.61)
 
 position_3 = Vec2d(
     position_2.x + math.cos(theta_3_with_offset) * length_3,
     position_2.y + math.sin(theta_3_with_offset) * length_3,
 )
 ```
+
+<x-text-editor file="/data/forward_kinematics.py" mode="python" />
+
+<x-button image="recruiting-website-motion" command="python forward_kinematics.py" label="Apply forward kinematics" working-directory="/data" />
+
+<x-image-viewer file="/data/forward_kinematics.png" mime="image/png" />
