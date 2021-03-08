@@ -29,21 +29,21 @@ def forward_kinematics(position_0: pymunk.Vec2d,
 
 
 # calculate position_3 with forward kinematics
-theta_0 = math.radians(0)
 theta_1 = math.radians(0)
 theta_2 = math.radians(0)
+theta_3 = math.radians(0)
 position_0 = pymunk.Vec2d(0.5, 0.55)
-length_0 = 0.2
 length_1 = 0.2
-length_2 = 0.15
+length_2 = 0.2
+length_3 = 0.15
 position_1, position_2, position_3, rotation_3 = forward_kinematics(
     position_0,
-    theta_0,
-    length_0,
     theta_1,
     length_1,
     theta_2,
     length_2,
+    theta_3,
+    length_3,
 )
 
 # drawing
@@ -64,13 +64,13 @@ s.draw_circle(position_2, joint_draw_radius, '#000')
 s.draw_line(position_2, position_3, joint_draw_thickness, '#000')
 s.draw_circle(position_3, joint_draw_radius, '#000')
 s.draw_text(
-    f'position_0: ({position_0.x:.2f}, {position_0.y:.2f})\ntheta_0: {math.degrees(theta_0):.1f}°',
+    f'position_0: ({position_0.x:.2f}, {position_0.y:.2f})\ntheta_1: {math.degrees(theta_1):.1f}°',
     position_0 - position_offset, '#000', 'rm')
 s.draw_text(
-    f'position_1: ({position_1.x:.2f}, {position_1.y:.2f})\ntheta_1: {math.degrees(theta_1):.1f}°',
+    f'position_1: ({position_1.x:.2f}, {position_1.y:.2f})\ntheta_2: {math.degrees(theta_2):.1f}°',
     position_1 + position_offset, '#000', 'lm')
 s.draw_text(
-    f'position_2: ({position_2.x:.2f}, {position_2.y:.2f})\ntheta_2: {math.degrees(theta_2):.1f}°',
+    f'position_2: ({position_2.x:.2f}, {position_2.y:.2f})\ntheta_3: {math.degrees(theta_3):.1f}°',
     position_2 - position_offset, '#000', 'rm')
 s.draw_text(
     f'position_3: ({position_3.x:.2f}, {position_3.y:.2f})\nrotation_3: {math.degrees(rotation_3):.1f}°',
