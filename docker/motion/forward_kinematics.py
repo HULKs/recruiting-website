@@ -10,16 +10,19 @@ def forward_kinematics(position_0: pymunk.Vec2d,
                        length_2: float,
                        theta_3: float,
                        length_3: float):
+    # calculate position_1
     theta_1_with_offset = theta_1 - math.radians(45)
     position_1 = pymunk.Vec2d(
         position_0.x + math.cos(theta_1_with_offset) * length_1,
         position_0.y + math.sin(theta_1_with_offset) * length_1,
     )
+    # calculate position_2
     theta_2_with_offset = theta_1_with_offset + theta_2 - math.radians(90)
     position_2 = pymunk.Vec2d(
         position_1.x + math.cos(theta_2_with_offset) * length_2,
         position_1.y + math.sin(theta_2_with_offset) * length_2,
     )
+    # calculate position_3
     theta_3_with_offset = theta_2_with_offset + theta_3 + math.radians(111.61)
     position_3 = pymunk.Vec2d(
         position_2.x + math.cos(theta_3_with_offset) * length_3,
