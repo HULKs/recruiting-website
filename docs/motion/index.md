@@ -190,3 +190,17 @@ second_theta_3 = rotation_3 - second_theta_1 - second_theta_2
  first_theta_3_with_offset =  first_theta_3 - math.radians(111.61)
 second_theta_3_with_offset = second_theta_3 - math.radians(111.61)
 ```
+
+At this point, all required calculations for the inverse kinematics are finished which allow calculating the required joint angles for reaching the end effector position and rotation. The following code contains the inverse kinematics calculations in the function `inverse_kinematics()`. The function gets the initial position `position_0`, the end effector position `position_3` and rotation `rotation_3`, and all segment lengths `length_*`. It returns the joint angles, i.e. `theta_*`:
+
+<x-text-editor file="/data/inverse_kinematics.py" mode="python" />
+
+You can execute the above code by clicking the following button. Feel free to change for example the end effector position `position_3` and rotation `rotation_3`.
+
+<x-button image="recruiting-website-motion" command="python inverse_kinematics.py" label="Apply inverse kinematics" working-directory="/data" />
+
+The output shows a visualization of the joints when moved to their calculated angles with the help of the inverse kinematics:
+
+<x-image-viewer file="/data/inverse_kinematics.png" mime="image/png" />
+
+Inverse kinematics allow to calculate the joint angles from the end effector position and rotation. Not all kinematic chains in the real world are as easily computable as our example. Often they cannot be solved analytically but require numerical methods. In the next section we will use the inverse kinematics to calculate the joint angles of our example NAO robot and try to kick the ball at the correct position.
