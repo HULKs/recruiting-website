@@ -4,11 +4,9 @@
 
 ## Introduction
 
-In this task you are supposed to help the Nao robot kick the ball as close to the grey target position as possible. To simplify this task, we will work in 2-dimensions only. For defining a kick motion, you should set the angles for the three parts of the Nao leg (thigh, tibia and foot).
+In this task you are supposed to help the Nao robot kick the ball as close to the target position as possible. To simplify this task, we will work in 2-dimensions and you can only control the robots right leg. Everything else is fixed in position. For defining a kick motion, you should set the angles for the three parts of the Nao leg (thigh, tibia and foot).
 
 Note that every joint has a minimum and maximum angle.
-
-If you want to test your code, you can click the "Generate animation" button below to see a visualisation of your code. In the left upper corner, you can see the time that has passed (in seconds) and the number below that shows the smallest distance between the ball and the target that you achieved with your current code.
 
 ## Keyframes
 
@@ -16,6 +14,14 @@ A motion is defined by a list of keyframes. Each keyframe contains the target an
 The position of the three joints and the neutral angles can be seen in the picture below.
 
 ![](joint_angles.png)
+
+## Your task
+
+In order to familiarise you with the concept of keyframes, your first task is to find keyframes by trying out different values. The text editor below already contains a list of 5 keyframes. When you press the "Generate animation button", you will see how these keyframes make the Nao robot move.
+
+Now, it is your turn to tell the Nao how to move. Change the angle and duration values in the keyframes, delete keyframes, or add new ones. And don't forget to regularly try out your code by pressing "Save" and then "Generate animation".
+
+Remember that the ultimate goal is to kick the ball as close to the target as possible, so try to generate motions that resemble a kick.
 
 <x-text-editor file="/data/generate_keyframes.py" mode="python" />
 
@@ -29,11 +35,11 @@ In the following sections, we explore how [end effector](https://en.wikipedia.or
 
 ### Forward Kinematics
 
-With the so called [forward kinematics](https://en.wikipedia.org/wiki/Forward_kinematics) one can calculate the position of the end effector from the set of involved joint angles. Just from common sense it is obvious, that such a calculation is possible, because the position in space is exactly defined, when given all joint angles. Since we want to control the robot's leg, we need a model of the leg first. Recall to the leg structure that we introduced earlier:
+With the so called [forward kinematics](https://en.wikipedia.org/wiki/Forward_kinematics) one can calculate the position of the end effector from the set of involved joint angles. Just from common sense it is obvious that such a calculation is possible because the position in space is exactly defined when given all joint angles. Since we want to control the robot's leg, we need a model of the leg first. Recall the leg structure that we introduced earlier:
 
 ![](kinematic_chain.png)
 
-The kinematic chain is constructed starting at the body of the robot where the leg is mounted. In our case this is the position of the hip joint or `position_0`. For calculating `position_1` at the end of the thigh with the length `length_1` and angle `theta_1`:
+The kinematic chain is constructed starting at the hip of the robot where the leg is mounted. In our case, this is the position of the hip joint or `position_0`. For calculating `position_1` at the end of the thigh with the length `length_1` and angle `theta_1`:
 
 ```python
 theta_1_with_offset = theta_1 - math.radians(45)
@@ -44,7 +50,7 @@ position_1 = Vec2d(
 )
 ```
 
-The end position of the tibia `position_2` is rotated by `theta_2` around `position_1` and translated by `length_2`. Since the zero angle depends on `theta_1` it is added to `theta_2` (rotating the hip joint also rotates the end effector of our kinematic chain):
+The end position of the tibia (`position_2`) is rotated by `theta_2` around `position_1` and translated by `length_2`. Since the zero angle depends on `theta_1`, it is added to `theta_2` (rotating the hip joint also rotates the end effector of our kinematic chain):
 
 ```python
 theta_2_with_offset = theta_1_with_offset + theta_2 - math.radians(90)
@@ -55,7 +61,7 @@ position_2 = Vec2d(
 )
 ```
 
-Lastly, the end position of the foot span `position_3` is rotated by `theta_3` around `position_2` and translated by `length_3`. Again, the previous rotation `theta_2` is added to `theta_3`:
+Lastly, the end position of the foot span (`position_3`) is rotated by `theta_3` around `position_2` and translated by `length_3`. Again, the previous rotation `theta_2` is added to `theta_3`:
 
 ```python
 theta_3_with_offset = theta_2_with_offset + theta_3 + math.radians(111.61)
@@ -66,11 +72,11 @@ position_3 = Vec2d(
 )
 ```
 
-When combining all calculations together we can now calculate all positions and rotations of the joints given the joint angles. In the following code the forward kinematics calculations are defined in the function `forward_kinematics()`. The function gets the initial position `position_0`, all joint angles `theta_*`, and segment lengths `length_*`. It returns all joint positions and the rotation of the end effector (at `position_3`, i.e. `rotation_3`):
+When combining all calculations together, we can now calculate all positions and rotations of the joints given the joint angles. In the following code, the forward kinematics calculations are defined in the function `forward_kinematics()`. This function takes as arguments the initial position `position_0`, all joint angles `theta_*`, and all segment lengths `length_*`. It returns all joint positions and the rotation of the end effector, i.e. `rotation_3` (at `position_3`):
 
 <x-text-editor file="/data/forward_kinematics.py" mode="python" />
 
-You can execute the above code by clicking the following button. Feel free to change the code (e.g. the angles `theta_*`).
+You can execute the above code by saving it and then clicking the "Apply Forward Kinematics" button. Feel free to change the code (e.g. the angles `theta_*`).
 
 <x-button image="recruiting-website-motion" command="python forward_kinematics.py" label="Apply forward kinematics" working-directory="/data" />
 
@@ -78,19 +84,19 @@ The output shows a visualization of the calculated joint positions with the help
 
 <x-image-viewer file="/data/forward_kinematics.png" mime="image/png" />
 
-We can see that the forward kinematics are an easy way to calculate the end effector position and rotation given all joint angles and segment lengths. In the next section we will use the inverse kinematics to calculate the joint angles from a given end effector position and rotation.
+We can see that the forward kinematics are an easy way to calculate the end effector position and rotation given all joint angles and segment lengths. In the next section, we will use inverse kinematics to calculate the joint angles from a given end effector position and rotation.
 
 ### Inverse Kinematics
 
 [Inverse kinematics](https://en.wikipedia.org/wiki/Inverse_kinematics) describe the inverse transform of the above described forward kinematics. In other words, when given a desired position and rotation of an end effector, one can obtain the joint angles necessary to reach this position from the inverse kinematics. One could use the forward kinematics to form an equation system for finding the joint angles (forward kinematics: *joint angles* -> *position*, inverse kinematics: *position* -> *joint angles*).
 
-In contrast to the forward kinematics such a solution does not always exist and can be ambiguous. In our example, we may have one of three possible cases: 1. *no solution* (impossible to reach), 2. *one solution* (only one set of joint angles reach the position), 3. *two solutions* (position is reachable with two sets of joint angles). As a more understandable example, consider holding your hand in fixed position in front of your head. You will find, that there exist an infinite amount of different arm angles to achieve this, i.e. there exist infinite solutions for possible joint angles.
+In contrast to the forward kinematics such a solution does not always exist and even if it exists, it can be ambiguous. In our example, we may have one of three possible cases: 1. *no solution* (impossible to reach that position), 2. *one solution* (only one set of joint angles reach the position), 3. *two solutions* (position is reachable with two sets of joint angles). As a more understandable example, consider holding your hand in fixed position in front of your head. You will find that there exist an infinite amount of different arm angles to achieve this, i.e. there exist infinite solutions for possible joint angles.
 
-Calculating the inverse kinematics can be performed in many possible ways. In special cases the inverse kinematics can be calculated analytically. But solving more complex forward kinematics may require numerical methods. In our example, we will calculate the inverse kinematics analytically and step-by-step to understand the concepts. Again, this is the kinematic chain used in the following sections:
+Calculating the inverse kinematics can be performed in many possible ways. In special cases, the inverse kinematics can be calculated analytically. But solving more complex forward kinematics may require numerical methods. In our example, we will calculate the inverse kinematics analytically and step-by-step to understand the concepts. Again, this is the kinematic chain used in the following sections:
 
 ![](kinematic_chain.png)
 
-Given an end effector position `position_3` and rotation `rotation_3` we will now calculate the required joint angles to reach the position. The calculation is divided into two parts: Calculating the position `position_2` first and then calculating the remaining angles `theta_3`, `theta_2`, and `theta_1`. Since we start with the position of the end effector and rotation, the `position_2` is simply the vector from `position_3` rotated by `rotation_3` with a length `length_3` (the vector is subtracted to point in the other direction, i.e. to `position_2`):
+Given an end effector position `position_3` and rotation `rotation_3` we will now calculate the required joint angles to reach the position. The calculation is divided into two parts: First, calculating the position `position_2`  and then calculating the remaining angles `theta_3`, `theta_2`, and `theta_1`. Since we start with the position of the end effector and rotation, the `position_2` is simply the vector from `position_3` rotated by `rotation_3` with length `length_3` (the vector is subtracted to point in the other direction, i.e. to `position_2`):
 
 ```python
 position_2 = Vec2d(
@@ -191,11 +197,11 @@ second_theta_3 = rotation_3 - second_theta_1 - second_theta_2
 second_theta_3_with_offset = second_theta_3 - math.radians(111.61)
 ```
 
-At this point, all required calculations for the inverse kinematics are finished which allow calculating the required joint angles for reaching the end effector position and rotation. The following code contains the inverse kinematics calculations in the function `inverse_kinematics()`. The function gets the initial position `position_0`, the end effector position `position_3` and rotation `rotation_3`, and all segment lengths `length_*`. It returns the joint angles, i.e. `theta_*`:
+At this point, all required calculations for the inverse kinematics are finished which allow calculating the required joint angles for reaching the end effector position and rotation. The following code contains the inverse kinematics calculations in the function `inverse_kinematics()`. This function takes as arguments the initial position `position_0`, the end effector position `position_3` and rotation `rotation_3`, and all segment lengths `length_*`. It returns the joint angles, i.e. `theta_*`:
 
 <x-text-editor file="/data/inverse_kinematics.py" mode="python" />
 
-You can execute the above code by clicking the following button. Feel free to change for example the end effector position `position_3` and rotation `rotation_3`.
+You can execute the above code by saving it and then clicking the "Apply Inverse Kinematics" button. Feel free to change for example the end effector position `position_3` and rotation `rotation_3`.
 
 <x-button image="recruiting-website-motion" command="python inverse_kinematics.py" label="Apply inverse kinematics" working-directory="/data" />
 
