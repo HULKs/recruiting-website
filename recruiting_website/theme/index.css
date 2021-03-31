@@ -208,6 +208,10 @@ ol {
   margin-left: 0.35rem;
 }
 
+.interactive-widgets-container {
+  margin: 0.5rem 0 1rem 0;
+}
+
 .interactive-widgets-box {
   background-color: #eee;
   border-radius: 0.5rem;
