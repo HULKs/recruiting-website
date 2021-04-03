@@ -23,7 +23,7 @@ If you are interested and want to participate, you should get in touch with us. 
 ## Equip Your Toolbox
 
 Like many professional software developers, we use Linux and our toolchain currently does not fully work on Windows or MacOS. In order to facilitate coding in a large team, we use Git and GitHUB which helps to avoid conflicts and keeps versioning clean. As programming languages we use C++ for the code that runs on our NAO robots, and for tooling we mainly use Python3.
-The links below are supposed to help you get the knowledge and skills you will need when working with the HULKs. Check some of them out if you want to learn more about these topics
+The links below are supposed to help you get the knowledge and skills you will need when working with the HULKs. Check some of them out if you want to learn more about these topics.
 
 Linux
 
