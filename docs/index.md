@@ -13,7 +13,7 @@ Here are two example tasks that represent simplified versions of typical problem
  
 ## Get In Touch
 
-If you are interested and want to participate, you should get in touch with us. Just use the HULKs Bootcamp Telegram invite-link below and write us a short message.
+If you are interested and want to participate, you should get in touch with us. Just use the HULKs Bootcamp Telegram invite-link below and write us a short message or ask any question you have (including questions about the example tasks).
 
  - For communication we use [Telegram](https://telegram.org/)
  - [HULKs Bootcamp Telegram Group invite-link](https://t.me/joinchat/yO0r_5wiZxY5ZWJi)
@@ -27,6 +27,7 @@ The links below are supposed to help you get the knowledge and skills you will n
 
 Linux
 
+ - [Linux command line](https://ubuntu.com/tutorials/command-line-for-beginners)
  - [Full system setup at HULKs](https://github.com/HULKs/nao/wiki/Full-system-setup)
  - [Manjaro at HULKs](https://github.com/HULKs/nao/wiki/Installing-Manjaro)
  - [VMware (if needs be) at HULKs](https://github.com/HULKs/nao/wiki/Installing-Manjaro#special-notes-vmware)
@@ -61,8 +62,9 @@ After setting up the basics, the real task of programming autonomous soccer robo
 
  - Become a Vereins-member
  - Attend meetings regularly
- - Familiarize yourself with our [KanBan](https://github.com/HULKs/nao/projects/13) workflow
- - Solve [Issues](https://github.com/HULKs/nao/issues?q=is%3Aissue+is%3Aopen+label%3A%22recruit+task%22)
+ - Familiarize yourself with the [KanBan workflow at HULKs](https://github.com/HULKs/nao/wiki/KanBan-Board)
+ - Check out the [KanBan Board at HULKs](https://github.com/HULKs/nao/projects/13)
+ - Solve [Issues at HULKs](https://github.com/HULKs/nao/issues?q=is%3Aissue+is%3Aopen+label%3A%22recruit+task%22)
  - Team up if you prefer to work in groups
  - Ask for help when you need help
- - Solve [Issue #1337](https://github.com/HULKs/nao/issues/1337)
+ - Solve [Issue #1337 at HULKs](https://github.com/HULKs/nao/issues/1337)
