@@ -3,4 +3,5 @@ theme: recruiting_website
 plugins:
 - recruiting_website_navigation
 - recruiting_website_title_remover
-- interactive_widgets
+- interactive_widgets:
+    backend_default_memory_limit_bytes: 201326592
