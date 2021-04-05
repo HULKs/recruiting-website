@@ -68,3 +68,7 @@ After setting up the basics, the real task of programming autonomous soccer robo
  - Team up if you prefer to work in groups
  - Ask for help when you need help
  - Solve [Issue #1337 at HULKs](https://github.com/HULKs/nao/issues/1337)
+ 
+<div align="center">
+    <a href=https://hulks.de/imprint/>Imprint/Impressum</a>
+</div>
