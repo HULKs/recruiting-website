@@ -307,19 +307,19 @@ def current_frame(score: float, ghost_ball_position: pymunk.Vec2d, ghost_ball_ro
     )
     draw_sprite_with_two_points(
         frame,
-        tibia_body.local_to_world(tibia.a),
-        tibia_body.local_to_world(tibia.b),
-        tibia_sprite,
-        tibia_joint_a_pixel,
-        tibia_joint_b_pixel,
-    )
-    draw_sprite_with_two_points(
-        frame,
         foot_body.local_to_world(foot.a),
         foot_body.local_to_world(foot.b),
         foot_sprite,
         foot_joint_a_pixel,
         foot_joint_b_pixel,
+    )
+    draw_sprite_with_two_points(
+        frame,
+        tibia_body.local_to_world(tibia.a),
+        tibia_body.local_to_world(tibia.b),
+        tibia_sprite,
+        tibia_joint_a_pixel,
+        tibia_joint_b_pixel,
     )
     draw_sprite_with_two_points(
         frame,
