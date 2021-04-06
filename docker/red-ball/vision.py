@@ -75,6 +75,13 @@ def plot_ball_detection(image, x, y, radius, r, g, b):
     x = 0
     y = radius
     d = 3 - (2 * radius)
+    
+    # draw starting pixel for each quadrant
+    draw_pixel(xc+y, yc)
+    draw_pixel(xc, yc+y)
+    draw_pixel(xc-y, yc)
+    draw_pixel(xc, yc-y)
+    
     while y >= x:
         x += 1
         if d > 0:
