@@ -26,7 +26,7 @@ The size of the image is returned by `image.width` and `image.height`.
 
 Note: this is idealized. In reality, we program in C++ and soccer-balls are not red.
 
-<x-prologue hidden image="recruiting-website-red-ball" command="bash -c 'cp /usr/src/app/{process_image.py,red-ball.png} /data/ && cp /data/{red-ball,output}.png && echo Initialized files.'" />
+<x-prologue hidden image="recruiting-website-red-ball" command="bash -c 'cp /usr/src/app/{*.py,*.png} /data/ && cp /data/{red-ball,output}.png && echo Initialized files.'" />
 
 <x-text-editor file="/data/process_image.py" mode="python" />
 
