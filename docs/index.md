@@ -12,7 +12,7 @@ In these tasks you will find embedded code editors, but you might want to copy &
 
 If you work in a team, you can try out working together in the same "room" by using the same "room name" in the URL. So when one person opens the task website and shares the URL with the rest of the team, you will all be working on the same files and can see the same results. That of course requires some coordination, so that you don't overwrite each others changes simultaneously.
 
- - [Vision Task](vision.md)
+ - [Vision Task](vision/)
  - [Motion Task](motion/)
  
 ## Get In Touch
