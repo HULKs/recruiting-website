@@ -8,8 +8,12 @@
 
 Here are two example tasks that represent simplified versions of typical problems we face. We encourage you to team up with a friend to try and solve these tasks, but, of course, you can also solve them on your own. It is not mandatory to solve these tasks in order to become a HULKs member, but it is a good exercise to test your skills and find out if you are interested in becoming a HULK.
 
- - [Vision](vision.md)
- - [Motion](motion/)
+In these tasks you will find embedded code editors, but you might want to copy & paste the code to a local editor of your choice for convenience and as backup, so you don't loose your code when reloading the website.
+
+If you work in a team, you can try out working together in the same "room" by using the same "room name" in the URL. So when one person opens the task website and shares the URL with the rest of the team, you will all be working on the same files and can see the same results. That of course requires some coordination, so that you don't overwrite each others changes simultaneously.
+
+ - [Vision Task](vision.md)
+ - [Motion Task](motion/)
  
 ## Get In Touch
 
