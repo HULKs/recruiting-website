@@ -167,6 +167,10 @@ ul {
   list-style-position: outside;
 }
 
+li {
+  padding: 0.5rem 0 0 0;
+}
+
 ol {
   padding: 0.5rem 0 1.5rem 1.5rem;
   list-style-type: decimal;
