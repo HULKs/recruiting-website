@@ -3,7 +3,6 @@ import typing
 import pymunk
 import pymunk.constraints
 from PIL import Image, ImageDraw, ImageFont
-import generate_keyframes
 from configuration import *
 
 font = ImageFont.truetype('JetBrainsMono-Regular.ttf', 14)
@@ -195,10 +194,6 @@ def draw_line(draw: ImageDraw, body: pymunk.Body, segment: pymunk.Segment, color
     draw_circle(draw, b, b, radius * pixel_scale, color)
 
 
-# angles in radians
-keyframes = generate_keyframes.generate_keyframes()
-
-
 def normalize_angle(input_angle: float) -> float:
     output_angle = input_angle % (2 * math.pi)
     return output_angle - (2 * math.pi) if output_angle > math.pi else output_angle
@@ -213,7 +208,8 @@ def get_current_angles(thigh_body: pymunk.Body, thigh: pymunk.Segment, tibia_bod
         foot.b) - foot_body.local_to_world(foot.a)
     return (
         normalize_angle(thigh_vector.angle - math.radians(thigh_angle)),
-        normalize_angle(tibia_vector.angle - thigh_vector.angle),
+        normalize_angle(tibia_vector.angle -
+                        thigh_vector.angle + (math.pi / 2)),
         normalize_angle(
             (foot_vector.angle - tibia_vector.angle - (math.pi / 2)) % (2 * math.pi)),
     )
@@ -258,6 +254,7 @@ def draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame: Image,
     frame.paste(rotated_sprite, (center_pixel - (radius_pixel,
                                                  radius_pixel)).int_tuple, mask=rotated_sprite)
 
+
 def get_current_ball_position():
     ball_x = ball.bb.left + ((ball.bb.right - ball.bb.left) / 2)
     ball_y = ball.bb.bottom + ((ball.bb.top - ball.bb.bottom) / 2)
@@ -286,7 +283,8 @@ def current_frame(score: float, ghost_ball_position: pymunk.Vec2d, ghost_ball_ro
             draw_transform(pymunk.Vec2d(ball_x, ground_y + ground_radius) -
                            (ball_shadow_radius * ball_shadow_scale)),
         ], fill=(0, 0, 0, 127))
-    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, target_position, target_radius, 0, target_sprite)
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(
+        frame, target_position, target_radius, 0, target_sprite)
     draw.multiline_text(
         (10, 10), f'Time: {len(frames) / 10:.1f} s\nSmallest Distance: {int(score * 100)} cm', font=font, fill='#000')
     draw_sprite_with_two_points(
@@ -332,58 +330,74 @@ def current_frame(score: float, ghost_ball_position: pymunk.Vec2d, ghost_ball_ro
     center = get_current_ball_position()
     radius = ball_radius
     angle_degrees = math.degrees(ball_body.angle)
-    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, ghost_ball_position, radius, ghost_ball_rotation, ghost_ball_sprite)
-    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, ghost_ball_position, radius, 0, ghost_ball_shadow_sprite)
-    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, center, radius, angle_degrees, ball_sprite)
-    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(frame, center, radius, 0, ball_shadow_sprite)
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(
+        frame, ghost_ball_position, radius, ghost_ball_rotation, ghost_ball_sprite)
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(
+        frame, ghost_ball_position, radius, 0, ghost_ball_shadow_sprite)
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(
+        frame, center, radius, angle_degrees, ball_sprite)
+    draw_sprite_with_center_comma_radius_oxford_comma_and_rotation(
+        frame, center, radius, 0, ball_shadow_sprite)
     return frame
 
 
-frames = []
-score = float('inf')
-ghost_ball_position = get_current_ball_position()
-ghost_ball_rotation = math.degrees(ball_body.angle)
-for keyframe in keyframes:
-    hip_angle, knee_angle, ankle_angle = get_current_angles(
-        thigh_body, thigh, tibia_body, tibia, foot_body, foot)
-    hip_angle_difference = keyframe['hip_angle'] - hip_angle
-    knee_angle_difference = keyframe['knee_angle'] - knee_angle
-    ankle_angle_difference = keyframe['ankle_angle'] - ankle_angle
-    hip_angle_velocity = clamp(
-        hip_angle_difference / keyframe['duration'], -maximum_velocity, maximum_velocity)
-    knee_angle_velocity = clamp(
-        knee_angle_difference / keyframe['duration'], -maximum_velocity, maximum_velocity)
-    ankle_angle_velocity = clamp(
-        ankle_angle_difference / keyframe['duration'], -maximum_velocity, maximum_velocity)
-    hip_motor.rate = -hip_angle_velocity
-    knee_motor.rate = -knee_angle_velocity
-    ankle_motor.rate = -ankle_angle_velocity
-    for _ in range(int(keyframe['duration'] * 10)):
-        for _ in range(100):
-            space.step(0.01 * 0.1)
-            current_score = abs(target_position - ball_body.position)
-            if current_score < score:
-                ghost_ball_position = get_current_ball_position()
-                ghost_ball_rotation = math.degrees(ball_body.angle)
-                score = current_score
-        frame = current_frame(score, ghost_ball_position, ghost_ball_rotation)
-        frames.append(frame)
-if len(frames) < minimal_frame_amount:
-    hip_motor.rate = 0
-    knee_motor.rate = 0
-    ankle_motor.rate = 0
-    for _ in range(minimal_frame_amount - len(frames)):
-        for _ in range(100):
-            space.step(0.01 * 0.1)
-            current_score = abs(target_position - ball_body.position)
-            if current_score < score:
-                ghost_ball_position = get_current_ball_position()
-                ghost_ball_rotation = math.degrees(ball_body.angle)
-                score = current_score
-        frame = current_frame(score, ghost_ball_position, ghost_ball_rotation)
-        frames.append(frame)
+if __name__ == '__main__':
+    frames = []
+    score = float('inf')
+    ghost_ball_position = get_current_ball_position()
+    ghost_ball_rotation = math.degrees(ball_body.angle)
+    import sys
+    if sys.argv[1] == 'plain':
+        import generate_keyframes
+        keyframes = generate_keyframes.generate_keyframes()
+    elif sys.argv[1] == 'inverse_kinematics':
+        import generate_keyframes_with_inverse_kinematics
+        keyframes = generate_keyframes_with_inverse_kinematics.generate_keyframes()
+    else:
+        raise RuntimeError('Unknown keyframe source')
+    for keyframe in keyframes:
+        hip_angle, knee_angle, ankle_angle = get_current_angles(
+            thigh_body, thigh, tibia_body, tibia, foot_body, foot)
+        hip_angle_difference = keyframe['hip_angle'] - hip_angle
+        knee_angle_difference = keyframe['knee_angle'] - knee_angle
+        ankle_angle_difference = keyframe['ankle_angle'] - ankle_angle
+        hip_angle_velocity = clamp(
+            hip_angle_difference / keyframe['duration'], -maximum_velocity, maximum_velocity)
+        knee_angle_velocity = clamp(
+            knee_angle_difference / keyframe['duration'], -maximum_velocity, maximum_velocity)
+        ankle_angle_velocity = clamp(
+            ankle_angle_difference / keyframe['duration'], -maximum_velocity, maximum_velocity)
+        hip_motor.rate = -hip_angle_velocity
+        knee_motor.rate = -knee_angle_velocity
+        ankle_motor.rate = -ankle_angle_velocity
+        for _ in range(int(keyframe['duration'] * 10)):
+            for _ in range(100):
+                space.step(0.01 * 0.1)
+                current_score = abs(target_position - ball_body.position)
+                if current_score < score:
+                    ghost_ball_position = get_current_ball_position()
+                    ghost_ball_rotation = math.degrees(ball_body.angle)
+                    score = current_score
+            frame = current_frame(
+                score, ghost_ball_position, ghost_ball_rotation)
+            frames.append(frame)
+    if len(frames) < minimal_frame_amount:
+        hip_motor.rate = 0
+        knee_motor.rate = 0
+        ankle_motor.rate = 0
+        for _ in range(minimal_frame_amount - len(frames)):
+            for _ in range(100):
+                space.step(0.01 * 0.1)
+                current_score = abs(target_position - ball_body.position)
+                if current_score < score:
+                    ghost_ball_position = get_current_ball_position()
+                    ghost_ball_rotation = math.degrees(ball_body.angle)
+                    score = current_score
+            frame = current_frame(
+                score, ghost_ball_position, ghost_ball_rotation)
+            frames.append(frame)
 
-print(f'Smallest Distance: {int(score * 100)} cm')
+    print(f'Smallest Distance: {int(score * 100)} cm')
 
-frames[0].save('animation.webp', save_all=True,
-               append_images=frames[1:], duration=100, loop=0)
+    frames[0].save('animation.webp', save_all=True,
+                   append_images=frames[1:], duration=100, loop=0)

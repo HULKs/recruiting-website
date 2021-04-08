@@ -85,53 +85,57 @@ def inverse_kinematic(position_0: pymunk.Vec2d, position_3: pymunk.Vec2d, rotati
         ]
 
 
-# calculate joint angles with inverse kinematics
-position_0 = pymunk.Vec2d(0.5, 0.55)
-position_3 = pymunk.Vec2d(0.6376735890632774, 0.2076091315972936)
-rotation_3 = -0.4082325120414736
-length_1 = 0.2
-length_2 = 0.2
-length_3 = 0.15
-set_of_joint_angles = inverse_kinematic(
-    position_0, position_3, rotation_3, length_1, length_2, length_3)
+if __name__ == '__main__':
+    # calculate joint angles with inverse kinematics
+    position_0 = pymunk.Vec2d(0.5, 0.55)
+    position_3 = pymunk.Vec2d(0.7376735890632774, 0.1976091315972936)
+    rotation_3 = -0.4082325120414736
+    length_1 = 0.2
+    length_2 = 0.2
+    length_3 = 0.15
+    set_of_joint_angles = inverse_kinematic(
+        position_0, position_3, rotation_3, length_1, length_2, length_3)
 
-# console output
-output = f'{len(set_of_joint_angles)} solutions for position_3: ({position_3.x:.2f}, {position_3.y:.2f}), rotation_3: {math.degrees(rotation_3):.1f}°'
-if len(set_of_joint_angles) > 0:
-    output += ':'
-    for index, joint_angles in enumerate(set_of_joint_angles):
-        output += f'\n  #{index + 1}: theta_1: {math.degrees(joint_angles.theta_1):.1f}°, theta_2: {math.degrees(joint_angles.theta_2):.1f}°, theta_3: {math.degrees(joint_angles.theta_3):.1f}°'
-print(output)
+    # console output
+    output = f'{len(set_of_joint_angles)} solutions for position_3: ({position_3.x:.2f}, {position_3.y:.2f}), rotation_3: {math.degrees(rotation_3):.1f}°'
+    if len(set_of_joint_angles) > 0:
+        output += ':'
+        for index, joint_angles in enumerate(set_of_joint_angles):
+            output += f'\n  #{index + 1}: theta_1: {math.degrees(joint_angles.theta_1):.1f}°, theta_2: {math.degrees(joint_angles.theta_2):.1f}°, theta_3: {math.degrees(joint_angles.theta_3):.1f}°'
+    print(output)
 
-# drawing
-joint_draw_radius = 0.0175
-joint_draw_thickness = 0.01
-s = scene.Scene(1.1333, 0.6, 720)
-s.draw_line(pymunk.Vec2d(0.5, 0.6), position_0, joint_draw_thickness, '#888')
-s.draw_circle(position_0, joint_draw_radius, '#000')
-position_2 = pymunk.Vec2d(
-    position_3.x - math.cos(rotation_3) * length_3,
-    position_3.y - math.sin(rotation_3) * length_3,
-)
-for index, joint_angles in enumerate(set_of_joint_angles):
-    theta_1_with_offset = joint_angles.theta_1 - math.radians(45)
-    position_1 = pymunk.Vec2d(
-        position_0.x + math.cos(theta_1_with_offset) * length_1,
-        position_0.y + math.sin(theta_1_with_offset) * length_1,
+    # drawing
+    joint_draw_radius = 0.0175
+    joint_draw_thickness = 0.01
+    s = scene.Scene(1.1333, 0.6, 720)
+    s.draw_line(pymunk.Vec2d(0.5, 0.6), position_0,
+                joint_draw_thickness, '#888')
+    s.draw_circle(position_0, joint_draw_radius, '#000')
+    position_2 = pymunk.Vec2d(
+        position_3.x - math.cos(rotation_3) * length_3,
+        position_3.y - math.sin(rotation_3) * length_3,
     )
-    s.draw_line(position_0, position_1, joint_draw_thickness, '#000')
-    s.draw_circle(position_1, joint_draw_radius, '#000')
-    s.draw_line(position_1, position_2, joint_draw_thickness, '#000')
-    s.draw_text(f'#{index + 1}', position_1, '#fff', 'mm')
-if len(set_of_joint_angles) == 0:
-    s.draw_text('no solutions', pymunk.Vec2d(0.5, s.height/2), '#000', 'mm')
-else:
-    heel_position = position_2 + \
-        pymunk.Vec2d(0.1, 0).rotated(rotation_3 + math.radians(23.39+180+39))
-    s.draw_line(position_2, heel_position, joint_draw_thickness, '#888')
-    s.draw_line(heel_position, position_3, joint_draw_thickness, '#888')
-    s.draw_circle(position_2, joint_draw_radius, '#000')
-    s.draw_line(position_2, position_3, joint_draw_thickness, '#000')
-    s.draw_circle(position_3, joint_draw_radius, '#000')
-s.draw_text(output, pymunk.Vec2d(0.01, 0.0825), '#000', 'la')
-s.save_png('inverse_kinematics.png')
+    for index, joint_angles in enumerate(set_of_joint_angles):
+        theta_1_with_offset = joint_angles.theta_1 - math.radians(45)
+        position_1 = pymunk.Vec2d(
+            position_0.x + math.cos(theta_1_with_offset) * length_1,
+            position_0.y + math.sin(theta_1_with_offset) * length_1,
+        )
+        s.draw_line(position_0, position_1, joint_draw_thickness, '#000')
+        s.draw_circle(position_1, joint_draw_radius, '#000')
+        s.draw_line(position_1, position_2, joint_draw_thickness, '#000')
+        s.draw_text(f'#{index + 1}', position_1, '#fff', 'mm')
+    if len(set_of_joint_angles) == 0:
+        s.draw_text('no solutions', pymunk.Vec2d(
+            0.5, s.height/2), '#000', 'mm')
+    else:
+        heel_position = position_2 + \
+            pymunk.Vec2d(0.1, 0).rotated(
+                rotation_3 + math.radians(23.39+180+39))
+        s.draw_line(position_2, heel_position, joint_draw_thickness, '#888')
+        s.draw_line(heel_position, position_3, joint_draw_thickness, '#888')
+        s.draw_circle(position_2, joint_draw_radius, '#000')
+        s.draw_line(position_2, position_3, joint_draw_thickness, '#000')
+        s.draw_circle(position_3, joint_draw_radius, '#000')
+    s.draw_text(output, pymunk.Vec2d(0.01, 0.0825), '#000', 'la')
+    s.save_png('inverse_kinematics.png')
