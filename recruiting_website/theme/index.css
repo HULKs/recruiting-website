@@ -362,6 +362,10 @@ ol {
   overflow-y: auto;
 }
 
+.interactive-widgets-button .outputs pre {
+  padding: 0;
+}
+
 .interactive-widgets-button .outputs .message {
   font-style: italic;
   color: #888;
