@@ -210,3 +210,11 @@ The output shows a visualization of the joints when moved to their calculated an
 <x-image-viewer file="/data/inverse_kinematics.png" mime="image/png" />
 
 Inverse kinematics allow to calculate the joint angles from the end effector position and rotation. Not all kinematic chains in the real world are as easily computable as our example. Often they cannot be solved analytically but require numerical methods. In the next section we will use the inverse kinematics to calculate the joint angles of our example NAO robot and try to kick the ball at the correct position.
+
+## Keyframes with Inverse Kinematics
+
+![](joint_angles.png)
+
+Wie man sieht, infeasible solutions weil Joint Angles nicht erreichbar. -> Lösungen aussortieren/filtern
+
+Nächster Schritt: Einbinden in Animation/Keyframes
