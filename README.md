@@ -19,7 +19,7 @@ The following steps are required for initial setup:
 1. Optional: Setup virtual environment for Python
 2. Install MkDocs and *interactive-widgets-mkdocs* plugin: `pip install git+https://github.com/h3ndrk/interactive-widgets-mkdocs.git`
 3. Install recruiting website packages: `pip install ./` (or `pip install --editable ./` for development)
-4. Build all required Docker images (`interactive-widgets-backend`, `interactive-widgets-monitor`, and your own) by running `COMPOSE_DOCKER_CLI_BUILD=0 docker-compose build` inside the `docker/`-directory (`COMPOSE_DOCKER_CLI_BUILD=0` is a workaround for https://github.com/docker/compose/issues/8046).
+4. Build all required Docker images (`interactive-widgets-backend`, `interactive-widgets-monitor`, and your own) by running `docker-compose build` inside the `docker/`-directory.
 5. Build website with MkDocs: `mkdocs build`
 6. Optional: Adjust the configuration in the generated files in the `site/`-directory.
 7. In the `site/`-directory, start the website via `docker-compose up --build` (`--build` is optional but ensures that the static files are correctly built into a Docker container *interactive-widgets-nginx*).
