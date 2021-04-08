@@ -21,15 +21,15 @@ If you are interested and want to participate, you should get in touch with us. 
 
 - For communication we use [Telegram](https://telegram.org/)
 - [HULKs Bootcamp Telegram Group invite-link](https://t.me/joinchat/yO0r_5wiZxY5ZWJi)
-- You should also have a [Github](https://github.com/) account, so we can provide access to our code and wiki.
-- Links below, with<img class="lock" src="baseline_lock_black_24dp.png" alt="lock"/>, will only be accessible once we have added your Github account to our team.
+- You should also have a [GitHub](https://github.com/) account, so we can provide access to our code and wiki.
+- Links below, with<img class="lock" src="baseline_lock_black_24dp.png" alt="lock"/>, will only be accessible once we have added your GitHub account to our team.
 
 ## Equip Your Toolbox
 
-Like many professional software developers, we use Linux and our toolchain currently does not fully work on Windows or MacOS. In order to facilitate coding in a large team, we use Git and GitHUB which helps to avoid conflicts and keeps versioning clean. As programming languages we use C++ for the code that runs on our NAO robots, and for tooling we mainly use Python.
+Like many professional software developers, we use Linux and our toolchain currently does not fully work on Windows or MacOS. In order to facilitate coding in a large team, we use Git and GitHub which helps to avoid conflicts and keeps versioning clean. As programming languages we use C++ for the code that runs on our NAO robots, and for tooling we mainly use Python.
 The links below are supposed to help you get the knowledge and skills you will need when working with the HULKs. Check some of them out if you want to learn more about these topics.
 
-Links below, with<img class="lock" src="baseline_lock_black_24dp.png" alt="lock"/>, will only be accessible once we have added your Github account to our team.
+Links below, with<img class="lock" src="baseline_lock_black_24dp.png" alt="lock"/>, will only be accessible once we have added your GitHub account to our team.
 
 Linux
 
@@ -45,8 +45,8 @@ Git
 - [Git Reference](https://git-scm.com/docs)
 - [Git Cheat Sheet](https://education.github.com/git-cheat-sheet-education.pdf)
 - [Alternative Git Cheat Sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet)
-- [Github](https://github.com/)
-- [Git & Github<img class="lock" src="baseline_lock_black_24dp.png" alt="lock"/>](https://github.com/HULKs/nao/wiki/Git-Guide)
+- [GitHub](https://github.com/)
+- [Git & GitHub<img class="lock" src="baseline_lock_black_24dp.png" alt="lock"/>](https://github.com/HULKs/nao/wiki/Git-Guide)
 
 C++
 
