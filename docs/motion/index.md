@@ -25,7 +25,7 @@ Remember that the ultimate goal is to kick the ball as close to the target as po
 
 <x-text-editor file="/data/generate_keyframes.py" mode="python" />
 
-<x-button image="recruiting-website-motion" command="python generate_animation.py" label="Generate animation" working-directory="/data" />
+<x-button image="recruiting-website-motion" command="python generate_animation.py plain" label="Generate animation" working-directory="/data" />
 
 <x-image-viewer file="/data/animation.webp" mime="image/webp" />
 
@@ -215,6 +215,11 @@ Inverse kinematics allow to calculate the joint angles from the end effector pos
 
 ![](joint_angles.png)
 
-Wie man sieht, infeasible solutions weil Joint Angles nicht erreichbar. -> Lösungen aussortieren/filtern
+As you can see, not all solutions of the inverse kinematics are feasible, as they can violate joint angle limits.
+Such infeasible solutions are beeing discarded in the following code.
 
-Nächster Schritt: Einbinden in Animation/Keyframes
+<x-text-editor file="/data/generate_keyframes_with_inverse_kinematics.py" mode="python" />
+
+<x-button image="recruiting-website-motion" command="python generate_animation.py inverse_kinematics" label="Generate animation" working-directory="/data" />
+
+<x-image-viewer file="/data/inverse_kinematics_animation.webp" mime="image/webp" />

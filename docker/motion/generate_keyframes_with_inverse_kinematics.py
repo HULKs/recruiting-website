@@ -5,12 +5,13 @@ import pymunk
 
 
 def generate_keyframes():
-    # These keyframes are just an example, you can turn them into comments
-    # Please calculate the angles and duration yourself and then return the generated keyframes
     position_0 = pymunk.Vec2d(0.5, 0.55)
     length_1 = 0.2
     length_2 = 0.2
     length_3 = 0.15
+
+    # These keyframes are just an example, you can turn them into comments
+    # Please calculate the angles and duration yourself and then return the generated keyframes
     position_keyframes = [
         {
             'position_3': pymunk.Vec2d(0.3376735890632774, 0.25),
@@ -28,6 +29,7 @@ def generate_keyframes():
             'duration': 0.3,
         },
     ]
+
     keyframes = []
     for i, position_keyframe in enumerate(position_keyframes):
         print(

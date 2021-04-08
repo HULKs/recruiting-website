@@ -399,5 +399,11 @@ if __name__ == '__main__':
 
     print(f'Smallest Distance: {int(score * 100)} cm')
 
-    frames[0].save('animation.webp', save_all=True,
-                   append_images=frames[1:], duration=100, loop=0)
+    if sys.argv[1] == 'plain':
+        frames[0].save('animation.webp', save_all=True,
+                    append_images=frames[1:], duration=100, loop=0)
+    elif sys.argv[1] == 'inverse_kinematics':
+        frames[0].save('inverse_kinematics_animation.webp', save_all=True,
+                    append_images=frames[1:], duration=100, loop=0)
+    else:
+        raise RuntimeError('Unknown keyframe source')
