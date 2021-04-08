@@ -122,12 +122,13 @@ table td {
 }
 
 h1 {
-  padding: 2rem 0 1rem 0;
+  padding: 2rem 0 2rem 0;
   font-weight: 700;
   font-size: 3rem;
   background-color: #2eac66;
   color: #ffffff;
   text-align: center;
+  border-radius: 0.5rem;
 }
 
 h2 {
@@ -187,8 +188,10 @@ ol {
 
 .iframe-wrapper-169 {
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%;
+  /* 16:9 */
   height: 0;
+  margin: 2rem 0;
 }
 
 .iframe-wrapper-169 iframe {
