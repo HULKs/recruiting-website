@@ -1,6 +1,6 @@
 # Motion Task
 
-<x-prologue hidden image="recruiting-website-motion" command="bash -c 'cp /usr/src/app/{*.py,*.png,*.ttf} /data/ && echo Initialized files.'" />
+<x-prologue hidden image="recruiting-website-motion" command="bash -c 'cp /usr/src/app/{*.py,*.png,*.ttf} /data/ && cd /data && python generate_animation.py plain && python forward_kinematics.py && python inverse_kinematics.py && python generate_animation.py inverse_kinematics'" />
 
 ## Introduction
 
