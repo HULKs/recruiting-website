@@ -1,0 +1,41 @@
+#ball_detection.loaded {
+  display: grid;
+  grid-template-columns: min-content min-content 1fr;
+  grid-template-rows: min-content min-content min-content;
+  grid-template-areas: "run_program image_selector ." "output output output" "image image image";
+  gap: 0.5rem;
+}
+
+#ball_detection.loaded #run_program {
+  grid-area: run_program;
+  white-space: nowrap;
+}
+
+#ball_detection.loaded #image_selector {
+  grid-area: image_selector;
+  white-space: nowrap;
+}
+
+#ball_detection.loaded #output {
+  grid-area: output;
+  max-height: 10rem;
+  overflow: auto;
+  font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
+    monospace;
+  font-size: 0.75rem;
+}
+
+#ball_detection.loaded #output .line {
+  display: block;
+  padding: 0 0 0 2rem;
+  text-indent: -2rem;
+  margin: 0;
+}
+
+#ball_detection.loaded #output .line.stderr {
+  color: red;
+}
+
+#ball_detection.loaded #image {
+  grid-area: image;
+}
