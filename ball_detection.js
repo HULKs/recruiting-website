@@ -17,7 +17,7 @@ let imageSelector = null;
 let imageSvg = null;
 let imageCanvasWidth = null;
 let imageCanvasHeight = null;
-let imageCanvasContext = null;
+let imageData = null;
 let output = null;
 
 if (codeValue === null) {
@@ -37,8 +37,12 @@ plot_detected_ball(x=25, y=35, radius=20)
 
 window.addEventListener("load", async function () {
   pyodide = await loadPyodide({
-    stdout: (line) => { addOutput(line, false); },
-    stderr: (line) => { addOutput(line, true); },
+    stdout: (line) => {
+      addOutput(line, false);
+    },
+    stderr: (line) => {
+      addOutput(line, true);
+    },
   });
   pyodideNamespace = pyodide.globals.get("dict")();
   pyodideNamespace.set("get_ball_image", getBallImage);
@@ -90,8 +94,14 @@ function updateCanvas() {
     canvas.height = image.height;
     imageCanvasWidth = image.width;
     imageCanvasHeight = image.height;
-    imageCanvasContext = canvas.getContext("2d");
-    imageCanvasContext.drawImage(image, 0, 0);
+    const context = canvas.getContext("2d");
+    context.drawImage(image, 0, 0);
+    imageData = context.getImageData(
+      0,
+      0,
+      imageCanvasWidth,
+      imageCanvasHeight
+    ).data;
 
     updateSvg();
     clearOutput();
@@ -123,7 +133,6 @@ function addOutput(line, isError) {
   if (output === null) {
     return;
   }
-  console.log(line, isError);
   const lineElement = document.createElement("pre");
   lineElement.classList.add("line");
   lineElement.classList.add(isError ? "stderr" : "stdout");
@@ -153,11 +162,12 @@ function getBallImage() {
       if (typeof keywordArguments.y !== "number") {
         throw "Missing keyword parameter y for Image.at(x, y)";
       }
-      const imageData = imageCanvasContext.getImageData(keywordArguments.x, keywordArguments.y, 1, 1);
+      const pixelIndexOffset =
+        (keywordArguments.y * imageCanvasWidth + keywordArguments.x) * 4;
       return {
-        r: imageData.data[0],
-        g: imageData.data[1],
-        b: imageData.data[2],
+        r: imageData[pixelIndexOffset + 0],
+        g: imageData[pixelIndexOffset + 1],
+        b: imageData[pixelIndexOffset + 2],
       };
     },
   };
