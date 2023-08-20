@@ -1,0 +1,8 @@
+jupyterlite-core
+jupyterlab
+jupyterlite-pyodide-kernel
+jupyterlab-night
+
+matplotlib
+numpy
+opencv-python
